@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#05070a"/>
+  <!-- Grid pattern -->
+  <defs>
+    <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+      <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#1c2838" stroke-width="1"/>
+    </pattern>
+    <radialGradient id="fade" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="black" stop-opacity="1"/>
+      <stop offset="70%" stop-color="black" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="black" stop-opacity="0"/>
+    </radialGradient>
+    <mask id="gridMask">
+      <rect width="1200" height="630" fill="url(#fade)"/>
+    </mask>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grid)" mask="url(#gridMask)"/>
+  <!-- Board outline -->
+  <rect x="430" y="240" width="340" height="150" rx="6" fill="none" stroke="#00e5ff" stroke-width="2" opacity="0.4"/>
+  <!-- Chips -->
+  <rect x="470" y="270" width="60" height="40" rx="2" fill="#111" stroke="#00e5ff" stroke-width="1" opacity="0.6"/>
+  <rect x="560" y="270" width="50" height="35" rx="2" fill="#111" stroke="#00e5ff" stroke-width="1" opacity="0.6"/>
+  <rect x="630" y="280" width="40" height="30" rx="2" fill="#111" stroke="#00e5ff" stroke-width="1" opacity="0.6"/>
+  <!-- LEDs -->
+  <circle cx="490" cy="340" r="5" fill="#00ff9d"/>
+  <circle cx="540" cy="340" r="5" fill="#00e5ff"/>
+  <circle cx="590" cy="340" r="5" fill="#ffb800"/>
+  <circle cx="640" cy="340" r="5" fill="#ff4757"/>
+  <!-- Title -->
+  <text x="600" y="140" text-anchor="middle" font-family="monospace" font-size="52" font-weight="700" fill="#e8eef5">BANDA JAIRAJ</text>
+  <text x="600" y="185" text-anchor="middle" font-family="monospace" font-size="22" fill="#00e5ff" letter-spacing="4">EMBEDDED SYSTEMS · ROBOTICS · IoT</text>
+  <text x="600" y="480" text-anchor="middle" font-family="monospace" font-size="18" fill="#6b7a8f">"I build systems that sense, think, communicate, and move."</text>
+  <text x="600" y="560" text-anchor="middle" font-family="monospace" font-size="14" fill="#4a5a6e" letter-spacing="2">JAIRAJ.DEV</text>
+</svg>

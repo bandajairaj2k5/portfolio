@@ -1,0 +1,170 @@
+/* ============================================================
+   LAYOUT.CSS — Nav, sections, grid, footer
+   ============================================================ */
+
+/* ---------- NAV ---------- */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: rgba(5, 7, 10, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid transparent;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--sp-6);
+  transition: border-color var(--t), background var(--t);
+}
+.nav.scrolled {
+  border-bottom-color: var(--border);
+  background: rgba(5, 7, 10, 0.92);
+}
+
+.nav-logo {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  transition: color var(--t), text-shadow var(--t);
+}
+.nav-logo:hover { color: var(--primary); text-shadow: 0 0 12px var(--primary-glow); }
+.nav-logo-bracket { color: var(--primary); opacity: 0.7; }
+.nav-logo-dot { color: var(--accent); }
+
+.nav-list {
+  display: flex;
+  gap: var(--sp-5);
+  align-items: center;
+}
+.nav-link {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  color: var(--text-3);
+  position: relative;
+  padding: var(--sp-2) 0;
+  transition: color var(--t);
+}
+.nav-link::before {
+  content: attr(data-num) " ";
+  color: var(--text-dim);
+  font-size: 0.7rem;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 0; height: 1px;
+  background: var(--primary);
+  transition: width var(--t-slow);
+}
+.nav-link:hover { color: var(--text); }
+.nav-link.active { color: var(--primary); }
+.nav-link.active::after { width: 100%; }
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  padding: var(--sp-2);
+}
+.nav-toggle span {
+  width: 22px; height: 2px;
+  background: var(--text);
+  transition: transform var(--t), opacity var(--t);
+}
+.nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle.open span:nth-child(2) { opacity: 0; }
+.nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+@media (max-width: 900px) {
+  .nav { padding: 0 var(--sp-4); }
+  .nav-toggle { display: flex; }
+  .nav-list {
+    position: fixed;
+    top: var(--nav-h); left: 0; right: 0;
+    flex-direction: column;
+    background: rgba(5, 7, 10, 0.98);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: var(--sp-5) var(--sp-4);
+    gap: var(--sp-4);
+    transform: translateY(-150%);
+    transition: transform var(--t-slow);
+    align-items: flex-start;
+  }
+  .nav-list.open { transform: translateY(0); }
+  .nav-link { font-size: 0.9rem; }
+}
+
+/* ---------- SECTIONS ---------- */
+.section {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: var(--sp-9) var(--sp-6);
+}
+@media (max-width: 768px) {
+  .section { padding: var(--sp-8) var(--sp-4); }
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-7);
+}
+.section-num {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--primary);
+  opacity: 0.6;
+}
+.section-title {
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border-bright), transparent);
+}
+.section-sub {
+  color: var(--text-3);
+  font-size: 0.95rem;
+  margin-bottom: var(--sp-7);
+  font-family: var(--font-mono);
+}
+
+/* ---------- FOOTER ---------- */
+.footer {
+  border-top: 1px solid var(--border);
+  background: var(--bg-2);
+  padding: var(--sp-7) var(--sp-6);
+  text-align: center;
+}
+.footer-content {
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+.footer-logo {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: 0.05em;
+  margin-bottom: var(--sp-2);
+}
+.footer-tagline {
+  color: var(--text-2);
+  font-size: 0.95rem;
+  margin-bottom: var(--sp-3);
+}
+.footer-meta {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  font-family: var(--font-mono);
+}

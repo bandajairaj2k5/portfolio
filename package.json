@@ -1,0 +1,8 @@
+{
+  "name": "jairaj-portfolio",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve public",
+    "build": "echo \"Static site - no build step needed\" && exit 0"
+  }
+}

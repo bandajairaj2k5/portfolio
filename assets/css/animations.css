@@ -1,0 +1,76 @@
+/* ============================================================
+   ANIMATIONS.CSS — Reveal, tilt, glow, circuit traces, misc
+   ============================================================ */
+
+/* ---------- REVEAL ON SCROLL ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- CARD TILT ---------- */
+.project-card {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ---------- CIRCUIT TRACE ANIMATION ---------- */
+@keyframes trace-flow {
+  0% { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: 0; }
+}
+
+/* ---------- GLOW PULSE ---------- */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 229, 255, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(0, 229, 255, 0.25); }
+}
+
+/* ---------- TYPEWRITER ---------- */
+@keyframes type-in {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* ---------- FLOAT ---------- */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* ---------- EASTER EGG BANNER ---------- */
+.easter-egg-banner {
+  position: fixed;
+  bottom: var(--sp-5);
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  z-index: 3000;
+  padding: var(--sp-4) var(--sp-6);
+  background: var(--surface);
+  border: 1px solid var(--warning);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--warning);
+  box-shadow: 0 0 30px rgba(255, 184, 0, 0.2);
+  opacity: 0;
+  transition: all var(--t-slow);
+  max-width: 90vw;
+  text-align: center;
+}
+.easter-egg-banner.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ---------- REDUCED MOTION ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .profile-scan, .hero-scroll-line, .scope-line, .status-dot { animation: none; }
+  .chat-fab { animation: none; }
+}

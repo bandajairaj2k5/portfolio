@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — Signal Lost | JAIRAJ.DEV</title>
+  <meta name="description" content="Error 404 — Signal lost. Even the ESP32 couldn't find this page." />
+  <meta name="robots" content="noindex" />
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    .error-container {
+      text-align: center;
+      z-index: 2;
+      position: relative;
+      padding: var(--sp-6);
+    }
+    .error-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 50px 50px;
+      opacity: 0.1;
+      mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+    }
+    .error-code {
+      font-family: var(--font-mono);
+      font-size: clamp(4rem, 15vw, 9rem);
+      font-weight: 700;
+      color: var(--error);
+      text-shadow: 0 0 40px rgba(255, 71, 87, 0.3);
+      line-height: 1;
+      margin-bottom: var(--sp-4);
+      animation: glitch 3s ease-in-out infinite;
+    }
+    @keyframes glitch {
+      0%, 100% { transform: translate(0); }
+      20% { transform: translate(-2px, 1px); }
+      40% { transform: translate(2px, -1px); }
+      60% { transform: translate(-1px, -2px); }
+      80% { transform: translate(1px, 2px); }
+    }
+    .error-title {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--warning);
+      letter-spacing: 0.1em;
+      margin-bottom: var(--sp-3);
+    }
+    .error-msg {
+      font-size: 1.05rem;
+      color: var(--text-2);
+      margin-bottom: var(--sp-7);
+      max-width: 500px;
+      line-height: 1.6;
+    }
+    .error-btn {
+      display: inline-block;
+      padding: var(--sp-3) var(--sp-6);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--bg);
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      transition: all var(--t);
+    }
+    .error-btn:hover {
+      box-shadow: var(--glow-primary);
+      transform: translateY(-2px);
+    }
+    .error-signal {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      margin-top: var(--sp-7);
+    }
+    .error-signal .dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--error);
+      margin-right: 6px;
+      animation: pulse-dot 1.5s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-grid"></div>
+  <div class="error-container">
+    <div class="error-code">404</div>
+    <p class="error-title">SIGNAL LOST</p>
+    <p class="error-msg">Even the ESP32 couldn't find this page. The signal has been dropped, the route is unreachable, and the watchdog timer gave up.</p>
+    <a href="/" class="error-btn">[ RETURN TO BASE ]</a>
+    <p class="error-signal"><span class="dot"></span> CONNECTION TERMINATED</p>
+  </div>
+</body>
+</html>
