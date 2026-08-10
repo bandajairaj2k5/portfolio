@@ -1,0 +1,128 @@
+/* ============================================================
+   BASE.CSS — Design tokens, reset, typography, scrollbar
+   ============================================================ */
+
+:root {
+  /* Color ramps */
+  --bg: #05070a;
+  --bg-2: #080c12;
+  --bg-3: #0c1218;
+  --surface: #0e141c;
+  --surface-2: #131b25;
+  --surface-3: #18222e;
+  --border: #1c2838;
+  --border-bright: #2a3d52;
+
+  /* Primary (cyan) */
+  --primary: #00e5ff;
+  --primary-2: #00b8d4;
+  --primary-dim: #006b7a;
+  --primary-glow: rgba(0, 229, 255, 0.15);
+
+  /* Secondary (blue) */
+  --secondary: #4d8bff;
+  --secondary-2: #2563eb;
+  --secondary-dim: #1e3a5f;
+
+  /* Accent (green) */
+  --accent: #00ff9d;
+  --accent-2: #00c97d;
+  --accent-dim: #007a4a;
+
+  /* Status */
+  --success: #00ff9d;
+  --warning: #ffb800;
+  --error: #ff4757;
+  --error-2: #ff6b7a;
+
+  /* Text */
+  --text: #e8eef5;
+  --text-2: #a8b5c4;
+  --text-3: #6b7a8f;
+  --text-dim: #4a5a6e;
+
+  /* Fonts */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+
+  /* Spacing (8px base) */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 64px;
+  --sp-9: 96px;
+
+  /* Layout */
+  --nav-h: 64px;
+  --max-w: 1200px;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-lg: 16px;
+
+  /* Transitions */
+  --t-fast: 0.15s ease;
+  --t: 0.25s ease;
+  --t-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Shadows / glow */
+  --glow-primary: 0 0 20px rgba(0, 229, 255, 0.2), 0 0 40px rgba(0, 229, 255, 0.08);
+  --glow-accent: 0 0 20px rgba(0, 255, 157, 0.2);
+}
+
+/* Reset */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--nav-h);
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+ul { list-style: none; }
+
+/* Headings */
+h1, h2, h3, h4 { line-height: 1.2; font-weight: 600; }
+
+/* Mono utility */
+.mono { font-family: var(--font-mono); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-2); }
+::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-dim); }
+
+/* Selection */
+::selection { background: var(--primary); color: var(--bg); }
+
+/* Focus visible */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
