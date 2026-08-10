@@ -1,0 +1,7 @@
+.vercel
+.env
+.env.local
+
+.env.local.new
+
+node_modules/
