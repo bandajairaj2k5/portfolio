@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NARADH — Personal AI Task Router</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- Google Identity Services (GIS) for Google Sign-In -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="frontend/styles.css">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER WITH GOOGLE AUTHENTICATION WIDGET -->
+  <header>
+    <div class="header-left">
+      <div class="logo-area">
+        <div class="logo-title">
+          ⚡ <span class="brand-accent">NARADH</span>
+        </div>
+        <span class="badge badge-console">AI TASK ROUTER</span>
+      </div>
+      <div class="subtitle">
+        Zero-friction handoff console — route prompts to optimal AI engines.
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE GOOGLE ACCOUNT PROFILE WIDGET -->
+    <div class="user-profile-widget" id="userProfileWidget">
+      <img id="userDpImg" class="dp-avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='%234F46E5'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-3.8-1.04-4.83-2.61.03-1.6 3.22-2.48 4.83-2.48s4.8 1.88 4.83 2.48C15.8 18.96 14.03 20 12 20z'/></svg>" alt="User Profile Picture">
+      <div class="dp-name" id="userNameDisplay">Guest User</div>
+      <div class="dp-email" id="userEmailDisplay">Sign in to sync history</div>
+      
+      <!-- Container for Google One-Tap / Sign-In Button -->
+      <div id="googleSignInBtnContainer" class="google-btn-container"></div>
+    </div>
+  </header>
+
+  <!-- WORKSPACE TAG CARD (LOCAL PROFILE TAG) -->
+  <div class="workspace-card">
+    <div class="workspace-info">
+      <span class="workspace-badge">🏷️ WORKSPACE TAG: <span id="activeWorkspaceDisplay">Default Workspace</span></span>
+      <span id="workspaceStatusMsg" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">
+        Local workspace tag for organizing local prompts.
+      </span>
+    </div>
+    <div class="workspace-input-group">
+      <input type="text" id="workspaceInput" class="workspace-input" placeholder="e.g. Work" maxlength="16" aria-label="Workspace tag">
+      <button class="btn btn-indigo" onclick="switchWorkspaceTag()">Set Tag</button>
+    </div>
+  </div>
+
+  <!-- ACTIVE PROJECT BANNER (DYNAMIC) -->
+  <div id="projectBanner" class="project-banner hidden">
+    <div class="project-banner-header">
+      <div class="project-title-tag">
+        <span>📌 ACTIVE PROJECT THREAD:</span>
+        <span id="projectPlatformBadge" class="badge" style="background:var(--accent-violet); color:#ffffff;">CLAUDE</span>
+      </div>
+      <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="endProject()">End Project</button>
+    </div>
+    <div class="project-body">
+      <strong id="projectTitle">Software Architecture Refactor</strong><br>
+      <strong>Domain/Category:</strong> <span id="projectCategory">Software Architecture</span><br>
+      <strong>Reasoning:</strong> <span id="projectReason">Selected to maintain multi-step project context end-to-end.</span><br>
+      <small style="color:var(--text-muted); display:block; margin-top:4px;">Initial Goal: "<span id="projectPromptSnippet">...</span>"</small>
+    </div>
+    <div class="project-actions">
+      <button class="btn btn-violet" id="projectOpenBtn" onclick="openActiveProjectPlatform()">
+        📋 Copy Prompt & Open Thread ↗
+      </button>
+    </div>
+  </div>
+
+  <!-- ROUTER CARD -->
+  <main class="card">
+    
+    <!-- CONTROLS ROW -->
+    <div class="controls-row">
+      <!-- MODE TOGGLE -->
+      <div>
+        <span class="card-title" style="margin-bottom: 6px; display: block;">ROUTING MODE</span>
+        <div class="segmented-control" role="group" aria-label="Routing Mode">
+          <button class="segmented-btn active" id="modeQuickBtn" onclick="setRoutingMode('quick')">Quick Task</button>
+          <button class="segmented-btn" id="modeProjectBtn" onclick="setRoutingMode('project')">Project Mode</button>
+        </div>
+      </div>
+
+      <!-- EFFORT TOGGLE -->
+      <div>
+        <span class="card-title" style="margin-bottom: 6px; display: block;">EFFORT LEVEL</span>
+        <div class="segmented-control" role="group" aria-label="Effort Level">
+          <button class="segmented-btn active" id="effortLowBtn" onclick="setEffort('low')">Low</button>
+          <button class="segmented-btn" id="effortMedBtn" onclick="setEffort('medium')">Medium</button>
+          <button class="segmented-btn" id="effortHighBtn" onclick="setEffort('high')">High</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROMPT TEXTAREA -->
+    <div>
+      <label for="promptInput" class="card-title" style="margin-bottom: 6px; display: block;">USER PROMPT</label>
+      <textarea id="promptInput" class="prompt-area" placeholder="Type or paste your task prompt here... (e.g. 'Write a Python script to scrape table data', 'Compare LLM reasoning benchmarks', 'Summarize this 500-page PDF report')"></textarea>
+    </div>
+
+    <!-- ACTIONS GRID -->
+    <div class="actions-grid">
+      <button class="btn btn-primary" id="routeBtn" onclick="handleRouteClick()">
+        <span>⚡ Route Prompt</span>
+      </button>
+
+      <div class="manual-picker">
+        <select id="manualSelect" onchange="handleManualSelect(this.value)" aria-label="Pick platform manually">
+          <option value="" disabled selected>Pick manually instead...</option>
+          <option value="claude">Claude (claude.ai)</option>
+          <option value="chatgpt">ChatGPT (chatgpt.com)</option>
+          <option value="gemini">Gemini (gemini.google.com)</option>
+          <option value="perplexity">Perplexity (perplexity.ai)</option>
+          <option value="deepseek">DeepSeek (chat.deepseek.com)</option>
+          <option value="kimi">Kimi (kimi.com)</option>
+          <option value="indus">Indus (indus.sarvam.ai)</option>
+          <option value="grok">Grok (grok.com)</option>
+        </select>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ROUTING RESULT CARD -->
+  <section id="resultCard" class="result-card hidden" aria-live="polite">
+    <div class="result-header">
+      <div class="platform-title">
+        <span>RECOMMENDED:</span>
+        <span id="resPlatformName" style="color:var(--accent-teal);">Claude</span>
+      </div>
+      <span id="resCategoryBadge" class="badge platform-badge">CODING & ARCHITECTURE</span>
+    </div>
+    
+    <div class="reasoning-box" id="resReasonText">
+      Claude is selected because of its superior step-by-step reasoning and precise code generation capabilities.
+    </div>
+
+    <div id="resFactorsList" class="factors-list"></div>
+
+    <button class="btn btn-teal copy-open-btn" id="copyOpenBtn" onclick="executeHandoff()">
+      📋 Copy Prompt & Open Platform ↗
+    </button>
+  </section>
+
+  <!-- PLATFORM ROSTER TABLE -->
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">🌐 Platform Roster & Capability Matrix</h2>
+    </div>
+    <div class="roster-table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Platform</th>
+            <th>Best For</th>
+            <th>Project</th>
+            <th>Research</th>
+            <th>Long Context</th>
+            <th>Handoff</th>
+          </tr>
+        </thead>
+        <tbody id="rosterTableBody">
+          <!-- Populated by app.js -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- HISTORY LOG -->
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title" id="historyCardTitle">📜 User Routing History</h2>
+      <button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="clearHistory()">Clear History</button>
+    </div>
+    <div id="historyList" class="history-list">
+      <!-- Populated by app.js -->
+    </div>
+  </section>
+
+</div>
+
+<!-- Application Controller Script -->
+<script src="frontend/app.js"></script>
+
+</body>
+</html>
