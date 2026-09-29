@@ -100,8 +100,8 @@ def main():
     parser = argparse.ArgumentParser(description="BUNNY CLOUD Automatic Sync Client")
     parser.add_argument("--server", default=DEFAULT_SERVER_URL, help="BUNNY CLOUD server URL")
     parser.add_argument("--dir", default=DEFAULT_SYNC_DIR, help="Local directory to sync")
-    parser.add_argument("--user", default="admin", help="Username")
-    parser.add_argument("--password", default="bunny1234", help="Password")
+    parser.add_argument("--user", default="BUNNY", help="Username")
+    parser.add_argument("--password", default="123456", help="Password")
     args = parser.parse_args()
 
     client = BunnySyncClient(args.server, args.dir)

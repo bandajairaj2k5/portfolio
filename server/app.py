@@ -348,8 +348,8 @@ def run_server():
     database.init_db()
     storage.init_storage_structure()
 
-    admin_user = os.environ.get("BUNNY_ADMIN_USER", "admin")
-    admin_pass = os.environ.get("BUNNY_ADMIN_PASS", "bunny1234")
+    admin_user = os.environ.get("BUNNY_ADMIN_USER", "BUNNY")
+    admin_pass = os.environ.get("BUNNY_ADMIN_PASS", "123456")
 
     conn = database.get_db()
     cursor = conn.cursor()

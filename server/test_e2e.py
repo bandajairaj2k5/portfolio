@@ -53,7 +53,7 @@ class TestE2EFlow(unittest.TestCase):
             self.assertEqual(data["status"], "online")
 
         # 2. Login
-        login_data = json.dumps({"username": "admin", "password": "bunny1234"}).encode()
+        login_data = json.dumps({"username": "BUNNY", "password": "123456"}).encode()
         req = urllib.request.Request(f"{base_url}/auth/login", data=login_data, headers={"Content-Type": "application/json"})
         with urllib.request.urlopen(req) as resp:
             res = json.loads(resp.read().decode())
