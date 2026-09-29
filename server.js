@@ -140,6 +140,31 @@ async function main() {
       return;
     }
 
+    if (pathname.startsWith('/auth/') || pathname.startsWith('/api/storage') || pathname.startsWith('/api/files') || pathname.startsWith('/api/folders') || pathname.startsWith('/api/auth/check')) {
+      const bunnyTarget = process.env.BUNNY_SERVER_URL || 'http://127.0.0.1:8082';
+      try {
+        const targetUrl = new URL(req.url, bunnyTarget);
+        const { http: httpMod } = await import('node:http');
+        const proxyReq = httpMod.request(targetUrl, {
+          method: req.method,
+          headers: req.headers,
+        }, (proxyRes) => {
+          res.writeHead(proxyRes.statusCode, proxyRes.headers);
+          proxyRes.pipe(res, { end: true });
+        });
+        proxyReq.on('error', () => {
+          res.writeHead(502, { 'Content-Type': 'application/json; charset=utf-8' });
+          res.end(JSON.stringify({ error: 'BUNNY CLOUD backend is offline or unreachable' }));
+        });
+        req.pipe(proxyReq, { end: true });
+        return;
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ error: 'Proxy error' }));
+        return;
+      }
+    }
+
     const safePath = pathname === '/' ? path.join(__dirname, 'index.html') : path.join(__dirname, pathname.replace(/^\//, ''));
     const normalizedPath = path.normalize(safePath);
     if (!normalizedPath.startsWith(__dirname)) {
