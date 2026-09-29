@@ -2192,7 +2192,25 @@
           alertEl.style.display = 'block';
         }
       } catch (err) {
-        alertEl.innerHTML = `⚠️ Cannot reach Moto G3 server.<br><small style="font-size:11px; font-weight:normal; margin-top:4px; display:block;">If viewing on GitHub Pages, configure your Moto G3 Server URL below under <b>⚙️ Server Connection Settings</b> (e.g., <code>http://192.168.x.x:8082</code> or tunnel URL).</small>`;
+        const isHttpsPage = window.location.protocol === 'https:';
+        const isHttpServer = loginEndpoint.startsWith('http://');
+
+        if (isHttpsPage && isHttpServer) {
+          alertEl.innerHTML = `
+            🔒 <b>Browser Mixed Content Security Warning</b><br>
+            <small style="font-size:11px; font-weight:normal; margin-top:6px; display:block; line-height:1.5;">
+              Your browser blocked <code>${loginEndpoint}</code> because this website is loaded over <b>HTTPS</b>.<br><br>
+              <b>To allow connection:</b><br>
+              1. Click the 🔒 <b>lock icon</b> (or pad lock) in your browser address bar at the top.<br>
+              2. Click <b>Site Settings</b> (or Permission settings).<br>
+              3. Set <b>Insecure Content</b> to <b>Allow</b>.<br>
+              4. Refresh this page and click <b>SIGN IN</b>.<br><br>
+              <i>Alternatively: Use an HTTPS tunnel URL (e.g., Cloudflare Tunnel / LocalTunnel) under <b>⚙️ Server Connection Settings</b> below.</i>
+            </small>
+          `;
+        } else {
+          alertEl.innerHTML = `⚠️ <b>Cannot connect to Moto G3 server</b><br><small style="font-size:11px; font-weight:normal; margin-top:4px; display:block;">Ensure your Moto G3 server is running and your address under <b>⚙️ Server Connection Settings</b> is correct.</small>`;
+        }
         alertEl.style.display = 'block';
         const details = document.getElementById('bunny-settings-details');
         if (details) details.open = true;
