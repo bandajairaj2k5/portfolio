@@ -16,7 +16,7 @@ export const portfolioKnowledge = {
       linkedin: 'https://linkedin.com/in/banda-jairaj-b38b1527a',
       github: 'https://github.com/bandajairaj2k5',
       website: 'https://bandajairaj2k5.github.io/portfolio',
-      resume: 'assets/resume/Jairaj_Banda_Resume.pdf'
+      resume: 'assets/resume/Banda_Jairaj_Resume.pdf'
     }
   },
   skills: {
