@@ -1066,13 +1066,13 @@
         <span class="glitch" data-text="BANDA JAIRAJ">BANDA JAIRAJ</span>
       </h1>
       <p class="hero-subtitle">
-        Electronics & Communication Engineer<br>
+        Final-Year ECE Student · Embedded Firmware Specialist<br>
         <span class="typewriter" id="typewriter"></span><span class="cursor" aria-hidden="true">|</span>
       </p>
       <div class="hero-specs">
-        <div class="spec-item"><span class="spec-label">FOCUS:</span> Embedded Systems</div>
-        <div class="spec-item"><span class="spec-label">STACK:</span> C/C++ · Python · Microcontrollers</div>
-        <div class="spec-item"><span class="spec-label">INTERESTS:</span> Robotics · ROS 2 · AI</div>
+        <div class="spec-item"><span class="spec-label">FOCUS:</span> Embedded Firmware & Bare-Metal STM32</div>
+        <div class="spec-item"><span class="spec-label">STACK:</span> Embedded C · C++ · Python</div>
+        <div class="spec-item"><span class="spec-label">INTERESTS:</span> Flight Controllers · IoT · ROS 2</div>
       </div>
       <div class="hero-cta">
         <a href="#projects" class="btn btn-primary">View Projects</a>
@@ -1105,13 +1105,13 @@
         <div class="about-content">
           <div class="about-card">
             <h3>Banda Jairaj</h3>
-            <p class="about-role">Electronics & Communication Engineering Student</p>
+            <p class="about-role">Final-Year ECE Student (Keshav Memorial College of Engineering, JNTUH)</p>
             <p class="about-bio">
-              I build real, working embedded systems from the ground up — and understand the hardware at the chip level, not just the code on top of it. From IoT home automation to flight controller firmware, I work across the full stack of electronics: schematic to PCB to firmware to cloud.
+              Final-year ECE student focused on embedded firmware. Designed and built a quadcopter flight controller end to end (schematic, PCB, firmware) and wrote bare-metal STM32 drivers at register level. Comfortable debugging C/C++ and Python from hardware to application layer. Seeking an entry-level embedded/firmware role.
             </p>
             <div class="about-stats">
-              <div class="stat"><span class="stat-num">4+</span><span class="stat-label">Projects</span></div>
-              <div class="stat"><span class="stat-num">5+</span><span class="stat-label">Certifications</span></div>
+              <div class="stat"><span class="stat-num">8</span><span class="stat-label">Projects</span></div>
+              <div class="stat"><span class="stat-num">4</span><span class="stat-label">Certifications</span></div>
               <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Hands-On</span></div>
             </div>
           </div>
@@ -1280,20 +1280,20 @@
           <div class="resume-page">
             <div class="resume-header">
               <h3>BANDA JAIRAJ</h3>
-              <p>Electronics & Communication Engineer</p>
+              <p>Final-Year ECE Student | Embedded Firmware Specialist</p>
             </div>
             <div class="resume-body">
               <div class="resume-col">
                 <h4>Education</h4>
-                <p>B.Tech — ECE<br><small>Keshav Memorial College Of Engineering</small></p>
+                <p>B.Tech, ECE — Keshav Memorial College of Engineering (CGPA: 6.05)<br><small>Intermediate (MPC): Narayana Jr College (85%) | School: Sri Sai Public School (80%)</small></p>
                 <h4>Skills</h4>
-                <p>Embedded C, C++, Python, Arduino, ESP32, PCB Design, IoT, ROS 2</p>
+                <p>Embedded C, C++, Python, ESP32, STM32 (BlackPill), Arduino, PCB Design, Blynk, ThingSpeak, Node.js, SQLite, Gemini API, ROS 2</p>
               </div>
               <div class="resume-col">
                 <h4>Projects</h4>
-                <p>ESP32 RC Car, Home Automation, Radar System, Quadcopter FC</p>
+                <p>Quadcopter Flight Controller, STM32 Bare-Metal Drivers, ESP32 RC Car, Weather Station, Ultrasonic Radar, Home Automation, BUNNY Server, NARADH AI Router</p>
                 <h4>Certifications</h4>
-                <p>Aigen Labs, JIJNASA, KMEC, Outskill</p>
+                <p>JIJNASA National, Aigen Labs, Outskill, KMCE</p>
               </div>
             </div>
           </div>
@@ -1558,91 +1558,163 @@
   <script>
     const projects = [
       {
+        id: 'quadcopter-flight-controller',
+        title: 'Quadcopter Flight Controller',
+        status: 'done',
+        statusText: 'SYSTEM STATUS: WORKING ✓',
+        shortDesc: 'Sole developer across schematic, PCB, and firmware bring-up for a quadcopter flight controller; tested firmware behaviour on physical hardware.',
+        tags: ['Embedded Firmware', 'PCB Design', 'STM32', 'C/C++', 'IMU'],
+        detail: {
+          overview: 'Designed and built a quadcopter flight controller end to end — covering schematic design, PCB layout, and bare-metal firmware bring-up. Tested flight control logic and sensor integration on physical hardware.',
+          problem: 'Commercial flight controllers are pre-built black boxes. Designing a custom flight controller requires solving hardware schematic design, PCB bring-up, real-time sensor processing, and motor output mixing.',
+          solution: 'Engineered a custom hardware board with an STM32 MCU and IMU sensor, wrote firmware routines for sensor reading and attitude calculation, and verified motor control signals directly on hardware.',
+          hardware: ['STM32 Microcontroller', 'IMU (Accelerometer + Gyroscope)', 'Custom PCB', 'ESCs & Motors', 'LiPo Battery'],
+          software: ['Embedded C / C++', 'PCB Design Software', 'Bare-Metal Drivers', 'PWM Generation', 'Sensor Interfacing'],
+          challenges: 'Noise reduction on IMU readings and ensuring precise timing loops for motor output without hardware control overhead.',
+          results: 'Successfully brought up the physical PCB and validated firmware response and motor mixing on hardware.',
+          learned: 'End-to-end hardware development lifecycle: from schematic capture and board layout to low-level firmware bring-up and physical verification.'
+        }
+      },
+      {
+        id: 'stm32-baremetal-drivers',
+        title: 'STM32 Bare-Metal GPIO & Button Input Drivers',
+        status: 'done',
+        statusText: 'SYSTEM STATUS: WORKING ✓',
+        shortDesc: 'Wrote LED-blink and button-input drivers for the STM32F411 (BlackPill) using direct register manipulation only, with no HAL or CMSIS.',
+        tags: ['STM32F411', 'Embedded C', 'Bare-Metal', 'Registers', 'Cortex-M4'],
+        detail: {
+          overview: 'Developed low-level GPIO output (LED blink) and input (button interrupt/polling) drivers for the STM32F411CEU6 BlackPill board using pure direct register access without using STM32 HAL or CMSIS headers.',
+          problem: 'Vendor HAL abstractions hide register configuration details, making it difficult to understand exact peripheral hardware operations and clock gating.',
+          solution: 'Consulted the STM32F411 reference manual register map directly to compute bitwise offsets for RCC clock enable, GPIO MODER, OTYPER, OSPEEDR, PUPDR, IDR, and ODR registers.',
+          hardware: ['STM32F411CEU6 BlackPill', 'Push Buttons', 'LEDs', 'ST-Link V2 Debugger'],
+          software: ['Embedded C', 'GCC ARM Toolchain', 'GDB', 'STM32F411 Reference Manual'],
+          challenges: 'Accurately computing bit offsets and avoiding unintended side-effects when modifying shared register bitmasks.',
+          results: 'Fully functional register-level drivers verified on hardware with zero external library overhead.',
+          learned: 'Deep understanding of ARM Cortex-M peripheral memory maps, memory-mapped I/O registers, and pointer dereferencing in C.'
+        }
+      },
+      {
         id: 'esp32-rc-car',
-        title: 'ESP32 RC Car with Blynk IoT',
+        title: 'ESP32-Based RC Car (Motor Control System)',
         status: 'done',
-        statusText: 'SYSTEM STATUS: DONE ✓',
-        shortDesc: 'WiFi-controlled RC car using ESP32 and Blynk IoT app. Real-time motor control with smartphone interface.',
-        tags: ['ESP32', 'Blynk', 'IoT', 'Motor Driver', 'C++'],
+        statusText: 'SYSTEM STATUS: WORKING ✓',
+        shortDesc: 'Implemented PWM-based DC motor control using TB6612FNG/DRV8833 drivers with Blynk remote control; debugged driver and timing issues.',
+        tags: ['ESP32', 'C++', 'Blynk', 'PWM', 'TB6612FNG/DRV8833'],
         detail: {
-          overview: 'A fully wireless RC car controlled via the Blynk IoT mobile app over WiFi. The ESP32 handles motor driving, PWM speed control, and real-time command processing.',
-          problem: 'Traditional RC cars use RF remotes with limited range and no telemetry. I wanted smartphone control with a modern IoT stack.',
-          solution: 'Used ESP32 for built-in WiFi + Bluetooth, paired with the Blynk platform for instant mobile UI without building a custom app.',
-          hardware: ['ESP32 DevKit V1', 'L298N Motor Driver', 'DC Motors (x4)', '18650 Li-ion Battery Pack', 'Chassis & Wheels'],
-          software: ['Arduino Framework (C++)', 'Blynk IoT Library', 'PWM Motor Control'],
-          challenges: 'Power management was tricky — the ESP32 browns out under high motor load. Solved by adding a dedicated 5V buck converter and decoupling capacitors.',
-          results: 'Smooth control over 30m+ range via WiFi. Latency under 100ms. Blynk dashboard shows battery voltage and connection status.',
-          learned: 'Importance of power supply design in embedded systems. Never underestimate voltage drops under load.'
+          overview: 'Built a Wi-Fi-controlled remote control car with ESP32. Implemented PWM DC motor control using TB6612FNG / DRV8833 drivers and integrated remote teleoperation via the Blynk mobile app.',
+          problem: 'Achieving smooth directional and speed control without motor driver brownouts or Wi-Fi control latency.',
+          solution: 'Designed firmware mapping virtual joystick coordinates to dual-channel PWM outputs driving motor H-bridge circuits, with incremental timing and driver isolation testing.',
+          hardware: ['ESP32 Dev Board', 'TB6612FNG / DRV8833 Drivers', 'DC Motors', 'Li-ion Battery', 'Robot Chassis'],
+          software: ['C++', 'Arduino Framework', 'Blynk Library', 'ESP32 PWM (LEDC)', 'Wi-Fi Stack'],
+          challenges: 'Solving driver timing and power supply noise under motor stall currents during quick directional reversals.',
+          results: 'Responsive Wi-Fi motor control system with reliable direction changing and PWM speed control.',
+          learned: 'H-bridge operation, dual-channel motor driver debugging, PWM frequency selection, and network command handling.'
         }
       },
       {
-        id: 'esp8266-home',
-        title: 'ESP8266 Home Automation',
+        id: 'iot-weather-station',
+        title: 'IoT Weather Station & Cloud Dashboard',
         status: 'done',
-        statusText: 'SYSTEM STATUS: DONE ✓',
-        shortDesc: 'Voice-controlled home automation using ESP8266, integrated with Google Assistant and Amazon Alexa.',
-        tags: ['ESP8266', 'Google Assistant', 'Alexa', 'Relay Module', 'IoT'],
+        statusText: 'SYSTEM STATUS: WORKING ✓',
+        shortDesc: 'Built DHT22 sensing with Wi-Fi upload to a ThingSpeak dashboard and threshold-based email alerts; analysed logged data in MATLAB.',
+        tags: ['ESP32', 'DHT22', 'ThingSpeak', 'MATLAB', 'IoT', 'Wi-Fi'],
         detail: {
-          overview: 'Smart home system that controls lights and appliances via voice commands through Google Assistant and Alexa, powered by ESP8266 and relay modules.',
-          problem: 'Wanted to automate room lights and fans without buying expensive commercial smart switches.',
-          solution: 'Built a custom relay board controlled by ESP8266, integrated with Sinric Pro / Alexa Smart Home Skill for voice control.',
-          hardware: ['NodeMCU ESP8266', '4-Channel Relay Module', '5V Power Supply', 'Jumper Wires', 'Enclosure'],
-          software: ['Arduino (C++)', 'Sinric Pro SDK', 'WiFiManager for AP config'],
-          challenges: 'Alexa discovery was inconsistent. Fixed by ensuring proper UUID formatting and using the Sinric Pro beta device template.',
-          results: '4 appliances controllable via "Hey Google" and "Alexa". Response time under 500ms. Works on local network without cloud dependency.',
-          learned: 'IoT device provisioning and the difference between cloud-dependent vs. local-control architectures.'
+          overview: 'Developed an IoT environmental monitoring station using ESP32 and a DHT22 sensor. Streamed real-time temperature and humidity metrics to a ThingSpeak cloud dashboard with email notifications and offline MATLAB analysis.',
+          problem: 'Continuous remote monitoring of environmental conditions requires reliable Wi-Fi sensor sampling, cloud data logging, and alert automation.',
+          solution: 'Programmed ESP32 to read DHT22 sensor values periodically, publish data via HTTP REST endpoints to ThingSpeak, trigger threshold email alerts, and export data into MATLAB for trend analysis.',
+          hardware: ['ESP32 Dev Board', 'DHT22 Temperature & Humidity Sensor', 'Breadboard', 'Power Supply'],
+          software: ['Embedded C / C++', 'ThingSpeak REST API', 'MATLAB', 'Wi-Fi Stack', 'HTTP Client'],
+          challenges: 'Ensuring steady sensor timing without blocking main Wi-Fi reconnect loops during network drops.',
+          results: 'Continuous cloud telemetry logging with automated alert triggers and offline MATLAB analysis.',
+          learned: 'Sensor data acquisition, IoT REST APIs, cloud dashboard setup, data analytics in MATLAB.'
         }
       },
       {
-        id: 'arduino-radar',
-        title: 'Arduino Radar System',
+        id: 'ultrasonic-radar-system',
+        title: 'Ultrasonic Radar System',
         status: 'done',
-        statusText: 'SYSTEM STATUS: DONE ✓',
-        shortDesc: 'Ultrasonic radar with servo sweep and Processing-based visual display. Detects objects and plots distance.',
-        tags: ['Arduino', 'Ultrasonic Sensor', 'Servo', 'Processing', 'HC-SR04'],
+        statusText: 'SYSTEM STATUS: WORKING ✓',
+        shortDesc: 'Built a servo-driven ultrasonic radar sweep, debugging sensor-noise and timing issues to produce a reliable distance-vs-angle scan.',
+        tags: ['ESP32', 'C++', 'Ultrasonic Sensor', 'Servo Motor', 'Processing'],
         detail: {
-          overview: 'A radar-style object detection system using an ultrasonic sensor mounted on a servo motor, with a real-time visual interface built in Processing.',
-          problem: 'Wanted to understand sensor fusion and spatial mapping basics without using expensive LiDAR.',
-          solution: 'HC-SR04 ultrasonic sensor on a 180° servo sweep, sending distance/angle data to a Processing sketch that renders a radar-style display.',
-          hardware: ['Arduino Uno', 'HC-SR04 Ultrasonic Sensor', 'SG90 Servo Motor', 'Breadboard & Wires'],
-          software: ['Arduino C++', 'Processing 3 (Java-based)', 'Serial Communication'],
-          challenges: 'Servo jitter caused noisy distance readings. Fixed by adding a 10µF capacitor across servo power and implementing median filtering in software.',
-          results: 'Reliable detection up to 2m range. Smooth radar sweep visualization. Angle resolution of ~3.6° per step.',
-          learned: 'Signal filtering basics, serial protocol design, and the limitations of ultrasonic sensing (beam width, multi-path echoes).'
+          overview: 'Constructed a 180° spatial radar scanner by sweeping an ultrasonic distance sensor on a servo motor powered by ESP32 in C++, with noise filtering for distance-vs-angle visualization.',
+          problem: 'Ultrasonic echo noise, mechanical servo vibration, and timing jitter degrade distance measurement accuracy.',
+          solution: 'Implemented precise pulse timing and software filtering for ultrasonic echo signals while coordinating angular servo stepping.',
+          hardware: ['ESP32', 'HC-SR04 Ultrasonic Sensor', 'SG90 Servo Motor', 'Jumper Wires'],
+          software: ['C++', 'Pulse Timing', 'Servo Library', 'Filter Algorithms'],
+          challenges: 'Overcoming sensor false-positives caused by acoustic reflection angles and electrical servo noise.',
+          results: 'Reliable 180° spatial distance-vs-angle scan with smooth visual tracking.',
+          learned: 'Time-of-flight acoustic sensing, noise filtering techniques, and synchronous actuation and sensing loops.'
         }
       },
       {
-        id: 'quadcopter-fc',
-        title: 'DIY Quadcopter — Flight Controller Build',
-        status: 'working',
-        statusText: 'STATUS: WORKING (DEBUGGING)',
-        shortDesc: 'Custom flight controller firmware for a DIY quadcopter. IMU-based stabilization with PID control — actively being debugged.',
-        tags: ['STM32', 'MPU6050', 'PID Control', 'Flight Dynamics', 'C++'],
+        id: 'esp32-home-automation',
+        title: 'ESP32 Home Automation System',
+        status: 'done',
+        statusText: 'SYSTEM STATUS: WORKING ✓',
+        shortDesc: 'Developed remote monitoring and control through the Blynk app; tested connectivity and command reliability over Wi-Fi.',
+        tags: ['ESP32', 'Blynk', 'IoT', 'Relay Control', 'Wi-Fi'],
         detail: {
-          overview: 'Building a custom flight controller from scratch on STM32, reading IMU data and running PID loops for pitch/roll/yaw stabilization.',
-          problem: 'Commercial flight controllers are black boxes. I wanted to understand the control theory and sensor fusion behind multirotor stability.',
-          solution: 'STM32F103 reads MPU6050 gyro/accel via I2C, computes attitude with complementary filter, and outputs PWM to 4 ESCs. Tuning PID gains manually.',
-          hardware: ['STM32F103C8T6 (Blue Pill)', 'MPU6050 IMU', '4x SimonK ESCs', '4x Brushless Motors', 'LiPo Battery', 'Frame'],
-          software: ['STM32 HAL / Arduino Core', 'Custom PID Controller', 'Complementary Filter', 'PWM Generation'],
-          challenges: 'IMU drift is the current blocker — yaw drifts over time due to gyro bias. Testing both complementary and Kalman filter approaches.',
-          results: 'Motors spin and respond to tilt. PID gains roughly tuned. Still working on stable hover — this is the active debug phase.',
-          learned: 'Control theory is easy in MATLAB, hard on real hardware with noise. Also: always isolate IMU from motor vibration.'
+          overview: 'Built a home automation system around ESP32 enabling remote appliance control and status monitoring over Wi-Fi via the Blynk mobile application.',
+          problem: 'Controlling electrical appliances reliably over wireless networks with feedback status reporting and safety.',
+          solution: 'Implemented ESP32 firmware listening to Blynk cloud updates, toggling GPIO channels connected to relay driver stages, and verifying network reconnect behavior.',
+          hardware: ['ESP32 Dev Board', '4-Channel Relay Module', 'Power Supply', 'Jumper Wires'],
+          software: ['Embedded C / C++', 'Blynk IoT Library', 'Wi-Fi Stack'],
+          challenges: 'Handling network dropouts gracefully without altering current relay states during reconnect.',
+          results: 'Tested and verified reliable remote monitoring and appliance switching over Wi-Fi.',
+          learned: 'Relay driver circuit safety, network state synchronization, and reliable IoT firmware design.'
+        }
+      },
+      {
+        id: 'bunny-assistant-server',
+        title: 'BUNNY — Personal Assistant Server',
+        status: 'done',
+        statusText: 'SYSTEM STATUS: WORKING ✓',
+        shortDesc: 'Converted an old Android phone into an always-on server using Termux, Python, and SQLite for automated job search & Telegram bot delivery.',
+        tags: ['Python', 'Termux', 'SQLite', 'Telegram Bot API', 'Android'],
+        detail: {
+          overview: 'Repurposed an old Android phone into an always-on server environment using Termux, Python, and SQLite. Built an automated job-search pipeline that queries, scores, filters listings, and delivers notifications via a Telegram bot.',
+          problem: 'Unused hardware often goes to waste, while hosting custom background automation tools on cloud VMs incurs continuous hosting costs.',
+          solution: 'Leveraged Termux Linux environment on Android to run a Python daemon, SQLite database, scheduled cron pipelines, and Telegram Bot API integration.',
+          hardware: ['Android Smartphone (Moto G3 / Termux Environment)', 'Power Supply'],
+          software: ['Python 3', 'Termux Linux', 'SQLite', 'Telegram Bot API', 'REST APIs'],
+          challenges: 'Managing Android OS battery optimization and background process killing to ensure 24/7 uptime.',
+          results: 'Low-footprint, 24/7 server running automated pipelines and Telegram bot delivery with zero cloud hosting cost.',
+          learned: 'Linux administration on ARM Android devices, background daemon management, database deduplication, and automated Telegram bot workflows.'
+        }
+      },
+      {
+        id: 'naradh-ai-task-router',
+        title: 'NARADH — Personal AI Task Router',
+        status: 'done',
+        statusText: 'SYSTEM STATUS: WORKING ✓',
+        shortDesc: 'Built a full-stack app that analyses a prompt and routes it to the most suitable of 8 AI platforms, using the Gemini API for intent classification.',
+        tags: ['Node.js/Express', 'SQLite', 'Google Gemini API', 'Full-Stack'],
+        detail: {
+          overview: 'Developed a full-stack web application named NARADH that analyzes incoming user prompts and intelligently routes them to the optimal AI platform out of 8 supported options using Google Gemini API for intent classification.',
+          problem: 'Different AI models excel at specific tasks (e.g., code generation, creative writing, reasoning, rapid search), but manually selecting the best model per prompt is slow and inefficient.',
+          solution: 'Created a Node.js/Express backend that passes user prompts to Google Gemini API for intent and task classification, dynamically selecting and routing queries to the ideal platform.',
+          hardware: ['Host PC / Web Server'],
+          software: ['Node.js', 'Express.js', 'Google Gemini API', 'SQLite', 'HTML/CSS/JS'],
+          challenges: 'Designing structured classification prompts for Gemini API to return consistent JSON intent categories reliably.',
+          results: 'Accurate prompt intent classification and automated routing across 8 AI platforms.',
+          learned: 'AI intent classification, LLM prompt engineering, Node.js full-stack development, and API routing architecture.'
         }
       }
     ];
 
     const skills = [
-      { category: 'Languages', icon: '💻', items: ['C / Embedded C', 'C++', 'Python'] },
-      { category: 'Hardware', icon: '🔌', items: ['Arduino', 'ESP32 / ESP8266', 'STM32', 'Raspberry Pi'] },
-      { category: 'Protocols & Tools', icon: '📡', items: ['I2C / SPI / UART', 'PWM / GPIO', 'MQTT / HTTP'] },
+      { category: 'Languages', icon: '💻', items: ['Embedded C', 'C++', 'Python'] },
+      { category: 'Embedded Platforms', icon: '🔌', items: ['ESP32', 'ESP8266', 'STM32 (BlackPill F411CEU6)', 'Arduino', 'Sensor Interfacing', 'PCB Design & Bringup'] },
+      { category: 'IoT & Software', icon: '📡', items: ['MQTT / HTTP', 'Blynk', 'ThingSpeak', 'Node.js / Express', 'SQLite', 'Telegram Bot API', 'Google Gemini API'] },
+      { category: 'Other / Learning', icon: '🤖', items: ['ROS 2 (in progress)'] }
     ];
 
     const certs = [
-      { org: 'Aigen Labs', name: 'Drone Training Basics', date: '2024', file: 'assets/certs/AAKRUTHI-2024.pdf', skills: ['Drones', 'UAV Basics'] },
-      { org: 'Bhoj Reddy Engineering College', name: 'JIJNASA — Electronic Ensemble', date: '2024', file: 'assets/certs/JIJNASA-ELECTRONIC%20ENSEMBLE-2024.pdf', skills: ['Electronics', 'Project Showcase'] },
-      { org: 'Bhoj Reddy Engineering College', name: 'JIJNASA — Vision Voyage', date: '2024', file: 'assets/certs/JIJNASA-VISION%20VOYAGE-2024.pdf', skills: ['Computer Vision', 'Project Showcase'] },
-      { org: 'KMEC', name: 'Internal Hackathon — Participation', date: '2024', file: 'assets/certs/KMEC%20ACHIEVEMENT%20CERTIFICATE.pdf', skills: ['Hackathon', 'Teamwork'] },
-      { org: 'Outskill', name: 'AI Mastermind', date: '2026', file: 'assets/certs/Outskill.pdf', skills: ['Python', 'Machine Learning', 'AI Fundamentals'] }
+      { org: 'JIJNASA National Event', name: 'JIJNASA National Certificate', date: '2024', file: 'assets/certs/JIJNASA-ELECTRONIC%20ENSEMBLE-2024.pdf', skills: ['Electronics', 'Innovation Showcase'] },
+      { org: 'Aigen Labs', name: 'Aigen Labs Certification', date: '2024', file: 'assets/certs/AAKRUTHI-2024.pdf', skills: ['Drone Training', 'UAV Basics'] },
+      { org: 'Outskill', name: 'Outskill Certification', date: '2026', file: 'assets/certs/Outskill.pdf', skills: ['Python', 'AI Fundamentals'] },
+      { org: 'Keshav Memorial College of Engineering', name: 'KMCE Certification', date: '2024', file: 'assets/certs/KMEC%20ACHIEVEMENT%20CERTIFICATE.pdf', skills: ['Hackathon', 'Engineering Excellence'] }
     ];
 
     const bootLines = [
@@ -1930,49 +2002,52 @@
       }
 
       if (isFollowUp) {
-        const esp = projects.find(item => item.id === 'esp32-rc-car');
+        const qc = projects.find(item => item.id === 'quadcopter-flight-controller');
+        activeProjectContext = 'quadcopter-flight-controller';
+        return getLocalProjectDeepDive(qc);
+      }
+
+      if (normalized.includes('quadcopter') || normalized.includes('flight controller')) {
+        activeProjectContext = 'quadcopter-flight-controller';
+        return 'Quadcopter Flight Controller (Personal Project):\n\n• Sole developer across schematic, PCB, and firmware bring-up for a quadcopter flight controller.\n• Tested firmware behaviour directly on physical hardware.\n\n(Ask "details of it" for full breakdown!)';
+      }
+
+      if (normalized.includes('stm32') || normalized.includes('baremetal') || normalized.includes('bare-metal') || normalized.includes('register') || normalized.includes('blackpill')) {
+        activeProjectContext = 'stm32-baremetal-drivers';
+        return 'STM32 Bare-Metal GPIO & Button Input Drivers (Personal Project):\n\n• Wrote LED-blink and button-input drivers for the STM32F411 (BlackPill) using direct register manipulation only, with no HAL or CMSIS.\n• Verified peripheral behaviour against the reference manual register map.\n\n(Ask "details of it" for full breakdown!)';
+      }
+
+      if (normalized.includes('rc car') || normalized.includes('motor control') || normalized.includes('tb6612') || normalized.includes('drv8833')) {
         activeProjectContext = 'esp32-rc-car';
-        return getLocalProjectDeepDive(esp);
+        return 'ESP32-Based RC Car (Personal Project):\n\n• Implemented PWM-based DC motor control using TB6612FNG/DRV8833 drivers with Blynk remote control.\n• Debugged driver and timing issues through incremental functional testing.\n\n(Ask "details of it" for full breakdown!)';
       }
 
-      if (normalized.includes('currently building') || normalized.includes('current project') || normalized.includes('in progress') || normalized.includes('working on') || normalized.includes('wip') || normalized.includes('active project') || normalized.includes('active build') || (normalized.includes('building') && !normalized.includes('list'))) {
-        activeProjectContext = 'quadcopter-fc';
-        return "Jairaj's currently active in-progress build is:\n\n• DIY Quadcopter Flight Controller Build (In Progress)\n  - Objective: Develop a custom flight controller for a DIY quadcopter.\n  - Microcontroller: STM32F103C8T6 with MPU6050 6-DOF IMU.\n  - Focus: Custom C++ PID stabilization loops, complementary filtering, and PWM motor driving.\n\n(Ask 'details of it' for full hardware, PID formula, and control loop breakdown!)";
+      if (normalized.includes('weather') || normalized.includes('thingspeak') || normalized.includes('dht22') || normalized.includes('matlab')) {
+        activeProjectContext = 'iot-weather-station';
+        return 'IoT Weather Station & Cloud Dashboard (Industrial Training Project):\n\n• Built DHT22 sensing with Wi-Fi upload to a ThingSpeak dashboard and threshold-based email alerts.\n• Analysed the logged telemetry data in MATLAB.\n\n(Ask "details of it" for full breakdown!)';
       }
 
-      if (normalized.includes('esp32') || normalized.includes('rc car') || normalized.includes('blynk')) {
-        activeProjectContext = 'esp32-rc-car';
-        if (normalized.includes('why esp32') || normalized.includes('why use esp32')) {
-          return 'Why ESP32 was chosen:\n\nESP32 features integrated Wi-Fi + Bluetooth and sufficient GPIO/PWM peripherals, making it ideal for compact IoT-controlled robotics without external communication shields.';
-        }
-        if (normalized.includes('why blynk') || normalized.includes('why use blynk')) {
-          return 'Why Blynk was chosen:\n\nBlynk provides a ready-made smartphone UI and IoT cloud backend, allowing instant mobile control over Wi-Fi without needing to develop a custom mobile application from scratch.';
-        }
-        if (normalized.includes('motor driver') || normalized.includes('l298n')) {
-          return 'Role of Motor Driver (L298N):\n\nESP32 GPIO pins operate at 3.3V and cannot supply high motor current. The motor driver acts as a high-power interface between ESP32 control logic and the motor power supply.';
-        }
-        return 'ESP32 RC Car with Blynk IoT (Completed):\n\n• Objective: Wireless RC car controlled from a smartphone over WiFi.\n• Tech Stack: ESP32, C++, Blynk IoT, PWM, motor control.\n• Results: Smooth control over 30m+ WiFi range with sub-100ms latency and Blynk battery telemetry.\n\n(Ask "details of it" for full breakdown!)';
+      if (normalized.includes('radar') || normalized.includes('ultrasonic') || normalized.includes('servo')) {
+        activeProjectContext = 'ultrasonic-radar-system';
+        return 'Ultrasonic Radar System (College Project):\n\n• Built a servo-driven ultrasonic radar sweep on ESP32 in C++.\n• Debugged sensor-noise and timing issues to produce a reliable distance-vs-angle scan.\n\n(Ask "details of it" for full breakdown!)';
       }
 
-      if (normalized.includes('home automation') || normalized.includes('alexa') || normalized.includes('google assistant') || normalized.includes('relay') || normalized.includes('relays') || normalized.includes('sinric') || normalized.includes('esp8266')) {
-        activeProjectContext = 'esp8266-home';
-        if (normalized.includes('relay') || normalized.includes('relays')) {
-          return 'Why Relays are Used:\n\nESP8266 operates at low-voltage logic (3.3V/5V), while household appliances operate at high mains voltage. Relays provide electrical switching and isolation (ESP8266 → Relay → Appliance).';
-        }
-        return 'ESP8266 Home Automation (Completed):\n\n• Objective: Control home appliances via voice assistants.\n• Tech Stack: NodeMCU ESP8266, 4-Channel Relay, C++, Sinric Pro SDK.\n• Features: Voice-controlled switching for 4 appliances with sub-500ms response time.\n\n(Ask "details of it" for full breakdown!)';
+      if (normalized.includes('home automation')) {
+        activeProjectContext = 'esp32-home-automation';
+        return 'ESP32 Home Automation System (College Project):\n\n• Developed remote monitoring and control through the Blynk app over Wi-Fi.\n• Tested connectivity and command reliability over Wi-Fi.\n\n(Ask "details of it" for full breakdown!)';
       }
 
-      if (normalized.includes('radar') || normalized.includes('ultrasonic') || normalized.includes('servo') || normalized.includes('processing')) {
-        activeProjectContext = 'arduino-radar';
-        return 'Arduino Radar System (Completed):\n\n• Setup: HC-SR04 ultrasonic sensor mounted on SG90 servo motor sweeping 180 degrees.\n• Visualization: Processing 3 desktop application rendering real-time radar mapping up to 2m.\n\n(Ask "details of it" for full breakdown!)';
+      if (normalized.includes('bunny') || normalized.includes('termux') || normalized.includes('telegram')) {
+        activeProjectContext = 'bunny-assistant-server';
+        return 'BUNNY — Personal Assistant Server (Personal Project):\n\n• Converted an old Android phone into a lightweight always-on server using Termux, Python, and SQLite.\n• Built a job-search pipeline with scheduled searches, scoring, filtering, and delivery through a Telegram bot.\n\n(Ask "details of it" for full breakdown!)';
       }
 
-      if (normalized.includes('quadcopter') || normalized.includes('flight controller') || normalized.includes('stm32') || normalized.includes('imu') || normalized.includes('pid')) {
-        activeProjectContext = 'quadcopter-fc';
-        return 'DIY Quadcopter Flight Controller Build (In Progress):\n\n• Objective: Custom flight controller for quadcopter stabilization.\n• Tech Stack: STM32F103C8T6, MPU6050 IMU, ESCs, LiPo Battery.\n• Firmware: Custom C++ PID control loops & complementary filtering.\n\n(Ask "details of it" for full breakdown!)';
+      if (normalized.includes('naradh') || normalized.includes('router') || normalized.includes('task router')) {
+        activeProjectContext = 'naradh-ai-task-router';
+        return 'NARADH — Personal AI Task Router (Full-Stack Web App):\n\n• Built a full-stack app in Node.js/Express, SQLite, and Google Gemini API.\n• Analyses incoming prompts and routes them to the most suitable of 8 AI platforms using Gemini API intent classification.\n\n(Ask "details of it" for full breakdown!)';
       }
 
-      return 'I can answer questions about Jairaj’s profile, education, projects (ESP32 RC Car, ESP8266 Home Automation, Arduino Radar, STM32 Quadcopter), skills, certifications, resume, and contact details.';
+      return 'I can answer questions about Jairaj’s profile, education (Keshav Memorial College of Engineering), 8 resume projects, technical skills, certifications, and contact details.';
     }
 
     async function callServerChat(promptText) {

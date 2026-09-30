@@ -1,36 +1,26 @@
 /* ============================================================
-   SKILLS.JS — Skills data (no percentage bars)
+   SKILLS.JS — Skills data matching official resume
    ============================================================ */
 
 const SKILLS = [
   {
-    category: "Hardware",
-    icon: "HW",
-    items: ["Arduino", "ESP8266", "ESP32", "Sensors", "Motor Drivers", "Electronics"]
-  },
-  {
-    category: "Embedded",
-    icon: "EM",
-    items: ["C", "Embedded C", "Microcontroller Programming"]
-  },
-  {
-    category: "Programming",
+    category: "Languages",
     icon: "PR",
-    items: ["Python", "C"]
+    items: ["Embedded C", "C++", "Python"]
   },
   {
-    category: "Robotics",
-    icon: "RB",
-    items: ["ROS 2", "Robot Control", "Sensor Integration"]
+    category: "Embedded Platforms",
+    icon: "HW",
+    items: ["ESP32", "ESP8266", "STM32 (BlackPill F411CEU6)", "Arduino", "Sensor Interfacing", "PCB Design & Bringup"]
   },
   {
-    category: "Design",
-    icon: "DS",
-    items: ["SOLIDWORKS", "3D Modelling"]
-  },
-  {
-    category: "IoT",
+    category: "IoT & Software",
     icon: "IO",
-    items: ["Blynk", "Wi-Fi Communication", "Home Automation"]
+    items: ["MQTT / HTTP", "Blynk", "ThingSpeak", "Node.js / Express", "SQLite", "Telegram Bot API", "Google Gemini API"]
+  },
+  {
+    category: "Other / Learning",
+    icon: "RB",
+    items: ["ROS 2 (in progress)"]
   }
 ];

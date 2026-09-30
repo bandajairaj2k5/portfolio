@@ -1,67 +1,60 @@
 /* ============================================================
-   FAQ-FALLBACK.JS — Non-AI fallback answers
-   Used if the Gemini API is unavailable or not configured.
-   Matches keywords to pre-written answers.
+   FAQ-FALLBACK.JS — Non-AI fallback answers matching resume
    ============================================================ */
 
 const FAQ_FALLBACK = {
-  // Keyword matching — first match wins
   entries: [
     {
       keywords: ["recruiter", "summary", "30-second", "tldr", "overview"],
-      answer: "Here's a 30-second summary: Jairaj is an Electronics & Communication Engineering student focused on Embedded Systems, Robotics, and IoT. He has hands-on experience with ESP32, ESP8266, and Arduino, and has built working projects including a Wi-Fi-controlled RC car, a voice-controlled home automation system, and an Arduino-based radar. His interests are moving toward robotics and ROS 2. He builds systems from the hardware up — not just the code on top."
+      answer: "Jairaj is a final-year ECE student at Keshav Memorial College of Engineering focused on embedded firmware. He designed and built a quadcopter flight controller end to end (schematic, PCB, firmware) and wrote bare-metal STM32 drivers at register level. He is seeking an entry-level embedded/firmware role."
     },
     {
-      keywords: ["esp32"],
-      answer: "Yes, Jairaj works with the ESP32. He used it to build a Wi-Fi-controlled RC car with the Blynk IoT platform, combining embedded programming, motor control, and wireless communication. The ESP32 is one of his primary microcontrollers for IoT projects."
+      keywords: ["quadcopter", "flight controller"],
+      answer: "Quadcopter Flight Controller (Personal Project): Sole developer across schematic, PCB, and firmware bring-up for a quadcopter flight controller; tested firmware behaviour on physical hardware using STM32."
     },
     {
-      keywords: ["esp8266"],
-      answer: "Jairaz uses the ESP8266 for IoT projects. He built a home automation system with it that controls electrical appliances remotely and includes voice control via Google Assistant and Amazon Alexa."
+      keywords: ["stm32", "bare-metal", "baremetal", "register", "blackpill"],
+      answer: "STM32 Bare-Metal Drivers: Wrote LED-blink and button-input drivers for the STM32F411 (BlackPill) using direct register manipulation only, with no HAL or CMSIS, verifying peripheral behaviour against the reference manual register map."
     },
     {
-      keywords: ["arduino"],
-      answer: "Yes, Jairaj works with Arduino. He built an Arduino-based radar system using an HC-SR04 ultrasonic sensor mounted on a servo, with a real-time Processing visualization on PC."
+      keywords: ["rc car", "motor control", "tb6612", "drv8833"],
+      answer: "ESP32-Based RC Car: Implemented PWM-based DC motor control using TB6612FNG/DRV8833 drivers with Blynk remote control; debugged driver and timing issues through incremental functional testing."
     },
     {
-      keywords: ["rc car", "robot car", "rcar"],
-      answer: "The ESP32 RC Car is a Wi-Fi-controlled robotic car. It uses an ESP32 microcontroller, an L298N motor driver, and two DC motors. It's controlled through the Blynk IoT mobile app, which sends joystick values over Wi-Fi that the firmware maps to motor speeds. Status: Working."
+      keywords: ["weather station", "thingspeak", "dht22", "matlab"],
+      answer: "IoT Weather Station & Cloud Dashboard: Built DHT22 sensing with Wi-Fi upload to a ThingSpeak dashboard and threshold-based email alerts; analysed logged data in MATLAB."
     },
     {
-      keywords: ["home automation", "iot skills", "smart home"],
-      answer: "Jairaj's ESP8266 Home Automation project demonstrates his IoT skills. It controls electrical appliances remotely via an app and voice assistants (Google Assistant, Amazon Alexa), using an ESP8266 and relay modules."
+      keywords: ["radar", "ultrasonic"],
+      answer: "Ultrasonic Radar System: Built a servo-driven ultrasonic radar sweep on ESP32 in C++, debugging sensor-noise and timing issues to produce a reliable distance-vs-angle scan."
     },
     {
-      keywords: ["radar"],
-      answer: "The Arduino Radar System uses an HC-SR04 ultrasonic sensor on a rotating servo to scan a 180-degree arc. The Arduino sends angle and distance data over serial to a Processing sketch that renders a real-time radar display."
+      keywords: ["home automation"],
+      answer: "ESP32 Home Automation System: Developed remote monitoring and control through the Blynk app over Wi-Fi."
     },
     {
-      keywords: ["ros", "ros2", "robotics"],
-      answer: "Jairaj is actively learning ROS 2 (Robot Operating System 2). His interests are increasingly moving toward robotics, where embedded hardware, sensing, control, and software come together. He's currently in the learning phase with ROS 2."
+      keywords: ["bunny", "android", "termux", "telegram bot"],
+      answer: "BUNNY Personal Assistant Server: Converted an old Android phone into a lightweight always-on server using Termux, Python, and SQLite. Built a job-search pipeline with scheduled searches, scoring, and delivery through a Telegram bot."
     },
     {
-      keywords: ["skills", "technologies", "tech stack", "what does he know", "work with"],
-      answer: "Jairaj's skills: Hardware (Arduino, ESP8266, ESP32, Sensors, Motor Drivers, Electronics), Embedded (C, Embedded C, Microcontroller Programming), Programming (Python, C), Robotics (ROS 2, Robot Control, Sensor Integration), Design (SOLIDWORKS, 3D Modelling), IoT (Blynk, Wi-Fi Communication, Home Automation)."
+      keywords: ["naradh", "ai task router", "gemini api", "routing"],
+      answer: "NARADH Personal AI Task Router: Full-stack web application in Node.js/Express, SQLite, and Google Gemini API that analyses a prompt and routes it to the most suitable of 8 AI platforms based on intent classification."
     },
     {
-      keywords: ["built", "projects", "made", "work"],
-      answer: "Jairaj has built three main projects: 1) ESP32 RC Car with Blynk IoT (Wi-Fi-controlled robotic car), 2) ESP8266 Home Automation (voice-controlled appliance switching), 3) Arduino Radar System (ultrasonic scanning with Processing visualization). All are working systems."
+      keywords: ["education", "college", "degree", "keshav", "school"],
+      answer: "Education:\n• B.Tech in ECE — Keshav Memorial College of Engineering (JNTUH), CGPA: 6.05, Expected 2027\n• Intermediate (MPC) — Narayana Junior College (85%, 2023)\n• Schooling (ICSE) — Sri Sai Public School (80%, 2021)"
     },
     {
-      keywords: ["contact", "email", "reach", "linkedin", "github"],
-      answer: "You can reach Jairaj via the Contact section of this site — links to Email, LinkedIn, GitHub, and Phone are all there."
+      keywords: ["skills", "technical skills", "languages", "tech stack"],
+      answer: "Technical Skills:\n• Languages: Embedded C, C++, Python\n• Embedded Platforms: ESP32, ESP8266, STM32 (BlackPill F411CEU6), Arduino, sensor interfacing, PCB design and bringup\n• IoT & Software: MQTT/HTTP, Blynk, ThingSpeak, Node.js/Express, SQLite, Telegram Bot API, Google Gemini API\n• Other: ROS 2 (in progress)"
     },
     {
-      keywords: ["resume", "cv"],
-      answer: "Jairaj's resume is available in the Resume section of this site — you can view it or download it as a PDF."
+      keywords: ["certification", "certifications", "certs"],
+      answer: "Certifications:\n1. JIJNASA National Certificate\n2. Aigen Labs Certification\n3. Outskill Certification\n4. KMCE Certification"
     },
     {
-      keywords: ["certification", "certificate", "certifications"],
-      answer: "Certification details are being added soon. Check the Certifications section of the site for the latest."
-    },
-    {
-      keywords: ["solidworks", "cad", "3d model"],
-      answer: "Jairaj uses SOLIDWORKS for 3D CAD modelling — designing custom parts and enclosures for robotics and hardware projects."
+      keywords: ["contact", "email", "phone", "linkedin", "github"],
+      answer: "Contact Jairaj:\n• Email: bandajairaj2k5@gmail.com\n• Phone: +91 76808 36062\n• LinkedIn: linkedin.com/in/banda-jairaj-b38b1527a\n• GitHub: github.com/bandajairaj2k5\n• Website: bandajairaj2k5.github.io/portfolio"
     }
   ],
 
@@ -75,5 +68,5 @@ const FAQ_FALLBACK = {
     return null;
   },
 
-  default: "I'm a portfolio assistant for Jairaj — I can tell you about his projects (ESP32 RC Car, ESP8266 Home Automation, Arduino Radar), his skills (Embedded Systems, IoT, Robotics, ROS 2), or give you a recruiter summary. Try asking \"What has Jairaj built?\" or \"Does he know ESP32?\""
+  default: "I am a portfolio assistant for Banda Jairaj. I can answer questions about his 8 resume projects (Quadcopter Flight Controller, STM32 Bare-Metal Drivers, ESP32 RC Car, IoT Weather Station, Ultrasonic Radar, ESP32 Home Automation, BUNNY Assistant Server, NARADH AI Task Router), technical skills, education at Keshav Memorial College of Engineering, and contact details."
 };
