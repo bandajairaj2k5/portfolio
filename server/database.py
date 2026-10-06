@@ -6,6 +6,24 @@ import hmac
 import secrets
 from pathlib import Path
 
+def load_dotenv():
+    base_dir = Path(__file__).resolve().parent.parent
+    for candidate in [base_dir / ".env", base_dir / ".env.local", Path.cwd() / ".env"]:
+        if candidate.exists() and candidate.is_file():
+            with open(candidate, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith("#") or "=" not in line:
+                        continue
+                    key, val = line.split("=", 1)
+                    key = key.strip()
+                    val = val.strip().strip("'\"")
+                    if key and key not in os.environ:
+                        os.environ[key] = val
+            break
+
+load_dotenv()
+
 DB_FILE = os.environ.get("BUNNY_DB_PATH", os.path.join(os.path.dirname(__file__), "bunny_cloud.db"))
 
 def get_db():
@@ -36,9 +54,16 @@ def init_db():
         user_id INTEGER NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         expires_at REAL NOT NULL,
+        last_activity REAL,
         FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
     );
     """)
+
+    # Check if last_activity column exists in existing DB
+    cursor.execute("PRAGMA table_info(sessions);")
+    columns = [row[1] for row in cursor.fetchall()]
+    if "last_activity" not in columns:
+        cursor.execute("ALTER TABLE sessions ADD COLUMN last_activity REAL;")
 
     # Folders table
     cursor.execute("""
@@ -103,6 +128,19 @@ def create_user(username: str, password: str, role: str = 'admin'):
     finally:
         conn.close()
 
+def update_user_password(username: str, new_password: str) -> bool:
+    pwd_hash, salt_hex = hash_password(new_password)
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE users SET password_hash = ?, salt = ? WHERE username = ?",
+        (pwd_hash, salt_hex, username)
+    )
+    affected = cursor.rowcount
+    conn.commit()
+    conn.close()
+    return affected > 0
+
 def authenticate_user(username: str, password: str):
     conn = get_db()
     cursor = conn.cursor()
@@ -119,12 +157,13 @@ def authenticate_user(username: str, password: str):
 
 def create_session(user_id: int, duration_hours: int = 72) -> str:
     token = secrets.token_hex(32)
-    expires_at = time.time() + (duration_hours * 3600)
+    now = time.time()
+    expires_at = now + (duration_hours * 3600)
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)",
-        (token, user_id, expires_at)
+        "INSERT INTO sessions (token, user_id, expires_at, last_activity) VALUES (?, ?, ?, ?)",
+        (token, user_id, expires_at, now)
     )
     conn.commit()
     conn.close()
@@ -145,9 +184,25 @@ def validate_session(token: str):
     if not session:
         return None
 
-    if session['expires_at'] < time.time():
+    now = time.time()
+    # Check hard expiration
+    if session['expires_at'] < now:
         delete_session(token)
         return None
+
+    # Check inactivity timeout (default 30 minutes, or configured BUNNY_SESSION_TIMEOUT_MINUTES)
+    timeout_minutes = int(os.environ.get("BUNNY_SESSION_TIMEOUT_MINUTES", "30"))
+    last_act = session['last_activity'] if session['last_activity'] is not None else session['expires_at'] - (72 * 3600)
+    if (now - last_act) > (timeout_minutes * 60):
+        delete_session(token)
+        return None
+
+    # Update last_activity timestamp
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE sessions SET last_activity = ? WHERE token = ?", (now, token))
+    conn.commit()
+    conn.close()
 
     return dict(session)
 
@@ -161,3 +216,4 @@ def delete_session(token: str):
 if __name__ == "__main__":
     init_db()
     print("Database initialized successfully.")
+

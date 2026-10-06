@@ -15,3 +15,6 @@ server/bunny_cloud.db
 BUNNY_CLOUD/
 BUNNY_CLOUD_SYNC/
 *.log
+cloudflared.exe
+cloudflared
+

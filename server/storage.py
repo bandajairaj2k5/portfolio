@@ -5,15 +5,17 @@ import mimetypes
 from pathlib import Path
 import database
 
-DEFAULT_STORAGE_ROOT = os.environ.get(
-    "BUNNY_STORAGE_ROOT",
-    os.path.join(os.path.expanduser("~"), "BUNNY_CLOUD")
-)
-
 DEFAULT_FOLDERS = ["Projects", "Firmware", "Documents", "Resume", "Backups", "Incoming", "Trash"]
 
 def get_storage_root() -> Path:
-    root = Path(DEFAULT_STORAGE_ROOT).resolve()
+    env_root = os.environ.get("BUNNY_STORAGE_ROOT")
+    if env_root:
+        path_str = env_root
+    elif os.path.exists("/sdcard"):
+        path_str = "/sdcard/CloudStorage"
+    else:
+        path_str = os.path.join(os.path.expanduser("~"), "CloudStorage")
+    root = Path(path_str).resolve()
     root.mkdir(parents=True, exist_ok=True)
     return root
 
@@ -36,22 +38,89 @@ def init_storage_structure():
     conn.commit()
     conn.close()
 
+    # Index any pre-existing physical files on disk without modifying or deleting them
+    sync_existing_physical_files()
+
+def sync_existing_physical_files():
+    root = get_storage_root()
+    if not root.exists():
+        return
+
+    conn = database.get_db()
+    cursor = conn.cursor()
+
+    for current_dir, dirs, files in os.walk(root):
+        curr_path = Path(current_dir)
+        try:
+            rel_dir = curr_path.relative_to(root).as_posix()
+        except ValueError:
+            continue
+
+        if rel_dir == ".":
+            rel_dir = ""
+
+        # Index folders
+        if rel_dir:
+            name = curr_path.name
+            parent = curr_path.parent.relative_to(root).as_posix() if curr_path.parent != root else ""
+            cursor.execute("SELECT id FROM folders WHERE relative_path = ?", (rel_dir,))
+            if not cursor.fetchone():
+                cursor.execute(
+                    "INSERT INTO folders (name, relative_path, parent_path) VALUES (?, ?, ?)",
+                    (name, rel_dir, parent)
+                )
+
+        # Index files
+        for filename in files:
+            file_path = curr_path / filename
+            if rel_dir:
+                rel_file = f"{rel_dir}/{filename}"
+            else:
+                rel_file = filename
+
+            cursor.execute("SELECT id FROM files WHERE relative_path = ?", (rel_file,))
+            if not cursor.fetchone():
+                try:
+                    size = file_path.stat().st_size
+                    mime = get_mime_type(filename)
+                    sha256 = calculate_sha256(file_path)
+                    cursor.execute(
+                        """
+                        INSERT INTO files (filename, relative_path, folder_path, size_bytes, mime_type, checksum_sha256, source)
+                        VALUES (?, ?, ?, ?, ?, ?, 'existing_storage')
+                        """,
+                        (filename, rel_file, rel_dir, size, mime, sha256)
+                    )
+                except Exception as e:
+                    print(f"Warning: Failed to index file {file_path}: {e}")
+
+    conn.commit()
+    conn.close()
+
+def check_traversal_attempt(*paths: str):
+    for p in paths:
+        if not p:
+            continue
+        p_str = str(p).replace("\\", "/")
+        parts = [part for part in p_str.split("/") if part]
+        if ".." in parts or ".." in p_str or p_str.startswith("/") or p_str.startswith("\\") or ":" in p_str:
+            raise ValueError(f"Path traversal attempt detected: {p}")
+
 def sanitize_path_segment(name: str) -> str:
     cleaned = name.replace("\\", "/").strip("/ ")
     parts = [p for p in cleaned.split("/") if p and p != ".." and p != "."]
     return "/".join(parts)
 
 def resolve_safe_path(relative_path: str) -> Path:
+    check_traversal_attempt(relative_path)
     root = get_storage_root()
-    normalized = relative_path.replace("\\", "/")
-    parts = [p for p in normalized.split("/") if p]
-    if ".." in parts or relative_path.startswith("/") or relative_path.startswith("\\"):
-        raise ValueError(f"Path traversal attempt detected: {relative_path}")
     clean_rel = sanitize_path_segment(relative_path)
     target = (root / clean_rel).resolve()
+    
     if not (target == root or root in target.parents):
         raise ValueError(f"Path traversal attempt detected: {relative_path}")
     return target
+
 
 def calculate_sha256(file_path: Path) -> str:
     sha256 = hashlib.sha256()
@@ -65,6 +134,7 @@ def get_mime_type(filename: str) -> str:
     return mime or "application/octet-stream"
 
 def save_file(filename: str, folder_path: str, file_bytes: bytes, source: str = "web", telegram_msg_id: int = None):
+    check_traversal_attempt(filename, folder_path)
     clean_folder = sanitize_path_segment(folder_path)
     folder_dir = resolve_safe_path(clean_folder)
     folder_dir.mkdir(parents=True, exist_ok=True)
@@ -107,6 +177,7 @@ def save_file(filename: str, folder_path: str, file_bytes: bytes, source: str = 
     return record
 
 def list_files_and_folders(folder_path: str = ""):
+    check_traversal_attempt(folder_path)
     clean_folder = sanitize_path_segment(folder_path)
     conn = database.get_db()
     cursor = conn.cursor()
@@ -151,6 +222,7 @@ def delete_file(file_id: int):
     return True
 
 def rename_file(file_id: int, new_name: str):
+    check_traversal_attempt(new_name)
     conn = database.get_db()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM files WHERE id = ?", (file_id,))
@@ -183,6 +255,7 @@ def rename_file(file_id: int, new_name: str):
     return updated
 
 def create_folder(folder_name: str, parent_path: str = ""):
+    check_traversal_attempt(folder_name, parent_path)
     clean_parent = sanitize_path_segment(parent_path)
     clean_name = Path(folder_name).name
     new_rel = f"{clean_parent}/{clean_name}".strip("/")

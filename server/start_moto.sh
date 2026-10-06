@@ -18,8 +18,12 @@ if ! command -v python &> /dev/null; then
     pkg update && pkg install -y python
 fi
 
-# Set storage root to internal storage or Termux home
-export BUNNY_STORAGE_ROOT="${BUNNY_STORAGE_ROOT:-$HOME/storage/shared/BUNNY_CLOUD}"
+# Set storage root to Moto G3 CloudStorage path (/sdcard/CloudStorage)
+if [ -d "/sdcard" ]; then
+    export BUNNY_STORAGE_ROOT="${BUNNY_STORAGE_ROOT:-/sdcard/CloudStorage}"
+else
+    export BUNNY_STORAGE_ROOT="${BUNNY_STORAGE_ROOT:-$HOME/storage/shared/CloudStorage}"
+fi
 mkdir -p "$BUNNY_STORAGE_ROOT"
 
 echo "Storage root set to: $BUNNY_STORAGE_ROOT"

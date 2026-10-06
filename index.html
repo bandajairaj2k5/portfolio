@@ -1050,7 +1050,7 @@
       <li><a href="#certs">Certs</a></li>
       <li><a href="#resume">Resume</a></li>
       <li><a href="#contact">Contact</a></li>
-      <li><a href="#bunny-storage" onclick="openBunnyStorageModal(event)" style="color:var(--accent);font-weight:bold;">🔒 My Storage</a></li>
+      <li><a href="#bunny-storage" onclick="openBunnyStorageModal(event)" style="color:var(--accent);font-weight:bold;">🔒 My Cloud</a></li>
     </ul>
   </nav>
 
@@ -1148,11 +1148,11 @@
       <div id="bunny-auth-view" class="bunny-card">
         <div class="bunny-header">
           <div>
-            <span class="bunny-logo">🔒 BUNNY CLOUD</span>
+            <span class="bunny-logo">🔒 MY CLOUD</span>
             <span class="bunny-badge">Moto G3 Physical Server</span>
           </div>
         </div>
-        <p class="bunny-desc">Enter your credentials to access your private storage server hosted on Motorola Moto G3.</p>
+        <p class="bunny-desc">Enter your password credentials to access your private personal cloud hosted on Motorola Moto G3 (/sdcard/CloudStorage).</p>
         
         <div id="bunny-login-alert" class="bunny-alert error" style="display:none;"></div>
         
@@ -1165,33 +1165,18 @@
             <label for="bunny-pass">PASSWORD</label>
             <input type="password" id="bunny-pass" required placeholder="••••••••" autocomplete="current-password" />
           </div>
-          <button type="submit" id="bunny-login-btn" class="btn btn-primary" style="width:100%; margin-top:10px;">SIGN IN TO STORAGE</button>
+          <button type="submit" id="bunny-login-btn" class="btn btn-primary" style="width:100%; margin-top:10px;">UNLOCK MY CLOUD</button>
         </form>
-
-        <!-- Server Connection Settings -->
-        <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border);">
-          <details id="bunny-settings-details">
-            <summary style="font-size: 11px; color: var(--accent); cursor: pointer; user-select: none;">⚙️ Server Connection Settings</summary>
-            <div class="form-group" style="margin-top: 10px;">
-              <label for="bunny-server-url" style="font-size: 10px; color: var(--text-dim);">MOTO G3 SERVER API URL</label>
-              <input type="text" id="bunny-server-url" placeholder="http://localhost:8082" style="font-size: 11px; padding: 6px 10px;" />
-              <div style="font-size: 10px; color: var(--text-dim); margin-top: 4px;">
-                Leave empty for default server, or enter your Moto G3 address (e.g. <code>http://localhost:8082</code> or <code>http://192.168.x.x:8082</code>).
-              </div>
-              <button type="button" onclick="saveBunnyServerUrl()" class="btn btn-secondary" style="font-size: 10px; padding: 4px 10px; margin-top: 6px;">SAVE SERVER URL</button>
-            </div>
-          </details>
-        </div>
       </div>
 
       <!-- STORAGE DASHBOARD VIEW -->
       <div id="bunny-dashboard-view" class="bunny-card" style="display:none;">
         <div class="bunny-header">
           <div>
-            <span class="bunny-logo">🔒 BUNNY CLOUD</span>
+            <span class="bunny-logo">🔒 MY CLOUD</span>
             <span class="bunny-badge online" id="bunny-server-status">ONLINE (Moto G3)</span>
           </div>
-          <button onclick="handleBunnyLogout()" class="btn btn-secondary" style="padding:4px 10px; font-size:11px;">SIGN OUT</button>
+          <button onclick="handleBunnyLogout()" class="btn btn-secondary" style="padding:4px 10px; font-size:11px;">🔒 Lock / Logout</button>
         </div>
 
         <div class="bunny-stats-bar">
@@ -2154,23 +2139,12 @@
     /* BUNNY CLOUD FRONTEND JAVASCRIPT LOGIC */
     let currentBunnyFolder = '';
     let bunnyToken = localStorage.getItem('bunny_token') || '';
+    const DEFAULT_BUNNY_API_URL = 'https://existed-citizenship-annotation-preview.trycloudflare.com';
 
     function getBunnyApiUrl(endpoint) {
-      let baseUrl = localStorage.getItem('bunny_server_url') || '';
+      let baseUrl = localStorage.getItem('bunny_server_url') || DEFAULT_BUNNY_API_URL;
       baseUrl = baseUrl.trim().replace(/\/$/, '');
-      return baseUrl ? baseUrl + endpoint : endpoint;
-    }
-
-    function saveBunnyServerUrl() {
-      const input = document.getElementById('bunny-server-url').value.trim();
-      if (input) {
-        localStorage.setItem('bunny_server_url', input);
-        alert('Server API URL set to: ' + input);
-      } else {
-        localStorage.removeItem('bunny_server_url');
-        alert('Server API URL reset to default relative path.');
-      }
-      checkBunnyAuth();
+      return baseUrl + endpoint;
     }
 
     function openBunnyStorageModal(e) {
@@ -2178,10 +2152,6 @@
       const modal = document.getElementById('bunny-storage-modal');
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
-      const urlInput = document.getElementById('bunny-server-url');
-      if (urlInput) {
-        urlInput.value = localStorage.getItem('bunny_server_url') || '';
-      }
       checkBunnyAuth();
     }
 

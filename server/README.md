@@ -1,6 +1,6 @@
-# 🔒 BUNNY CLOUD - Motorola Moto G3 Private Cloud Storage Server
+# 🔒 MY CLOUD - Motorola Moto G3 Private Personal Cloud Storage Server
 
-BUNNY CLOUD is a private personal cloud storage system built to run directly on a **Motorola Moto G3 (3rd gen)** using Termux / Linux environment, integrated with Telegram Bot ingestion and a Cyberpunk portfolio web interface.
+MY CLOUD is a private personal cloud storage system running directly on a **Motorola Moto G3** (`/sdcard/CloudStorage`) via Termux / Linux environment, accessible through a **“My Cloud”** button on your public portfolio web interface.
 
 ---
 
@@ -9,15 +9,15 @@ BUNNY CLOUD is a private personal cloud storage system built to run directly on 
 ```
                                   INTERNET
                                      |
-                             Secure Tunnel (Cloudflared/SSH)
+                       HTTPS Tunnel (Cloudflared / Tailscale)
                                      |
                                      v
                        +---------------------------+
-                       | Portfolio Web Interface   |
-                       |    ("🔒 My Storage")      |
+                       | Public Portfolio Web UI   |
+                       |      ("🔒 My Cloud")      |
                        +-------------+-------------+
                                      |
-                           REST API / WebSockets
+                          REST API (Cookies/Bearer)
                                      |
                                      v
                        +---------------------------+
@@ -31,78 +31,88 @@ BUNNY CLOUD is a private personal cloud storage system built to run directly on 
                                      |
                                      v
                            Physical File Storage
-                             (BUNNY_CLOUD/)
+                           (/sdcard/CloudStorage)
 ```
 
 ---
 
-## 🚀 Setup on Motorola Moto G3 (Termux)
+## 🔑 How to Set / Change the Cloud Password
 
-1. **Install Termux** on Moto G3.
-2. **Grant Storage Permissions**:
+1. **Via Environment File (`.env`)**:
+   Open or create `.env` in the root folder of your project:
+   ```env
+   BUNNY_ADMIN_USER=BUNNY
+   BUNNY_ADMIN_PASS=YourNewSuperSecurePasswordHere
+   ```
+   Restart the server (`python server/app.py` or `bash server/start_moto.sh`). The server automatically updates the salted PBKDF2 hash in SQLite on startup.
+
+2. **Via Python Command Line**:
+   Run this single command on your Moto G3 / server:
+   ```bash
+   python -c "import server.database as db; db.update_user_password('BUNNY', 'YourNewPasswordHere')"
+   ```
+
+---
+
+## 🚀 How to Start the Moto G3 Server
+
+1. **Install & Setup Termux on Moto G3**:
    ```bash
    termux-setup-storage
-   ```
-3. **Install Python & Git**:
-   ```bash
    pkg update && pkg upgrade
-   pkg install python git openssh
+   pkg install python git
    ```
-4. **Clone / Copy Codebase to Termux**:
+2. **Launch with Startup Script**:
    ```bash
-   git clone https://github.com/bandajairaj2k5/portfolio.git
-   cd portfolio
+   bash server/start_moto.sh
    ```
-5. **Configure Environment (`.env`)**:
-   Create a `.env` file in the project root:
-   ```env
-   BUNNY_PORT=8082
-   BUNNY_ADMIN_USER=admin
-   BUNNY_ADMIN_PASS=your_strong_password
-   TELEGRAM_BOT_TOKEN=your_bot_token_from_botfather
-   TELEGRAM_ALLOWED_USER_ID=your_telegram_id
-   ```
-6. **Start the BUNNY CLOUD Server**:
+   Or run the Python server directly:
    ```bash
    python server/app.py
    ```
-7. **Start Telegram Bot Service**:
+3. **Exposing Externally via HTTPS (Recommended)**:
+   Do not expose raw HTTP directly on public ports. Use a Cloudflare Tunnel:
    ```bash
-   python server/telegram_bot.py
+   cloudflared tunnel --url http://localhost:8082
    ```
+   Copy the generated HTTPS URL (e.g. `https://your-tunnel.trycloudflare.com`).
 
 ---
 
-## 📱 Telegram Ingestion Workflow
+## 🌐 How the Portfolio Connects to Moto G3
 
-1. Send any document, photo, firmware (`robot_v2.bin`), or zip to your Telegram Bot.
-2. The bot responds with interactive folder choice buttons:
-   `[ Projects ]` `[ Firmware ]` `[ Documents ]` `[ Resume ]` `[ Backups ]` `[ Incoming ]`
-3. Click a folder.
-4. The bot downloads the file directly to Moto G3 physical storage, calculates SHA-256 checksum, updates SQLite database, and returns confirmation:
-   ```
-   ✓ Saved
-
-   Firmware/robot_v2.bin
-   Size: 2.4 MB
-   SHA-256: 4f8a...
-   ```
+1. Click **🔒 My Cloud** in the portfolio navigation bar.
+2. The password login screen will appear.
+3. Open **⚙️ Server Connection Settings** in the modal and paste your Moto G3 HTTPS tunnel address (or local IP e.g. `http://192.168.1.50:8082`).
+4. Enter your credentials and click **UNLOCK MY CLOUD**.
+5. Client saves only the secure session token in `localStorage` (never the plaintext password).
 
 ---
 
-## 🔒 Security Features
+## 🔒 Security Features & Controls
 
-- **PBKDF2-HMAC-SHA256 Password Hashing** (600,000 iterations).
-- **Session Tokens** with expiration and authorization headers.
-- **Strict Path Traversal Protection**: rejects `../` or escapes outside `BUNNY_CLOUD/`.
-- **SHA-256 Verification** on all stored files.
-- **Zero Hardcoded Secrets**: environment variable separation & `.gitignore` enforcement.
+- **Password Security**: Server-side PBKDF2-HMAC-SHA256 password hashing (600,000 iterations + 16-byte random salt). Plaintext passwords are never stored in source code, GitHub, or frontend.
+- **Session Protection**: Automatic inactivity expiration (default 30 mins) and HttpOnly session cookies / Bearer tokens.
+- **Path Traversal Shield**: Blocks `../`, `..\`, absolute paths, and escaping outside `/sdcard/CloudStorage`.
+- **Brute-force Rate Limiting**: Temporary 5-minute lockout (HTTP 429) after 5 failed login attempts per IP.
+- **CORS Restriction**: Restricted to your portfolio domain (`BUNNY_ALLOWED_ORIGIN`).
+- **Data Preservation**: Pre-existing files in `/sdcard/CloudStorage` are automatically indexed into SQLite on startup without deleting or modifying your physical files.
 
 ---
 
-## ⚡ Automatic Sync Client (Laptop)
+## 🧪 Security Tests Performed
 
-To synchronize files from your laptop to Moto G3 automatically:
+Run the unit and end-to-end test suites:
+
 ```bash
-python server/bunny_sync.py --server http://<MOTO_G3_IP>:8082 --dir ./BUNNY_CLOUD_SYNC --user admin --password your_password
+python -m unittest server/test_server.py
+python -m unittest server/test_e2e.py
 ```
+
+### Verified Test Assertions:
+1. **Unauthenticated API Rejection**: All file endpoints return HTTP `401 Unauthorized` without a valid session token.
+2. **Path Traversal Defense**: Requests attempting `../` or path traversal return HTTP `400 Bad Request`.
+3. **Brute-Force Lockout**: 5 consecutive invalid login attempts trigger HTTP `429 Too Many Requests`.
+4. **Session Inactivity Timeout**: Inactive sessions automatically expire after the configured timeout.
+5. **Physical Data Preservation**: Pre-existing files on `/sdcard/CloudStorage` are indexed cleanly without modification.
+

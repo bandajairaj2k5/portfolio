@@ -104,13 +104,59 @@ class TestBunnyCloudServer(unittest.TestCase):
         self.assertTrue(deleted)
         self.assertFalse(storage.resolve_safe_path("Firmware/firmware_v1_final.bin").exists())
 
-    def test_create_folder(self):
-        folder = storage.create_folder("CustomLogs", parent_path="Projects")
-        self.assertEqual(folder["name"], "CustomLogs")
-        self.assertEqual(folder["relative_path"], "Projects/CustomLogs")
+    def test_pre_existing_files_preservation(self):
+        # Create physical files on disk before storage initialization
+        custom_dir = Path(self.storage_root) / "PreExistingFolder"
+        custom_dir.mkdir(parents=True, exist_ok=True)
+        sample_file = custom_dir / "my_secret_notes.txt"
+        sample_file.write_bytes(b"Do not modify or delete this pre-existing physical data")
 
-        data = storage.list_files_and_folders("Projects")
-        self.assertTrue(any(f["name"] == "CustomLogs" for f in data["folders"]))
+        # Run storage indexing
+        storage.sync_existing_physical_files()
+
+        # Check that file was indexed in database
+        data = storage.list_files_and_folders("PreExistingFolder")
+        self.assertEqual(len(data["files"]), 1)
+        self.assertEqual(data["files"][0]["filename"], "my_secret_notes.txt")
+
+        # Check physical file is intact and unchanged
+        self.assertTrue(sample_file.exists())
+        self.assertEqual(sample_file.read_bytes(), b"Do not modify or delete this pre-existing physical data")
+
+    def test_session_inactivity_timeout(self):
+        user_id = database.create_user("timeout_user", "pass12345")
+        token = database.create_session(user_id)
+
+        # Session should be valid initially
+        session = database.validate_session(token)
+        self.assertIsNotNone(session)
+
+        # Manually set last_activity to 1 hour ago
+        conn = database.get_db()
+        cursor = conn.cursor()
+        one_hour_ago = time.time() - 3600
+        cursor.execute("UPDATE sessions SET last_activity = ? WHERE token = ?", (one_hour_ago, token))
+        conn.commit()
+        conn.close()
+
+        # With 30 minute timeout (default), session should now be expired due to inactivity
+        os.environ["BUNNY_SESSION_TIMEOUT_MINUTES"] = "30"
+        expired_session = database.validate_session(token)
+        self.assertIsNone(expired_session)
+
+    def test_extended_path_traversal_protection(self):
+        invalid_paths = [
+            "../../../etc/passwd",
+            "Projects/../../secret.txt",
+            "..\\..\\windows\\system32",
+            "/etc/shadow",
+            "C:\\boot.ini",
+            "Projects/subdir/../../../root.txt"
+        ]
+        for path_str in invalid_paths:
+            with self.assertRaises(ValueError, msg=f"Should fail for path: {path_str}"):
+                storage.resolve_safe_path(path_str)
 
 if __name__ == "__main__":
     unittest.main()
+

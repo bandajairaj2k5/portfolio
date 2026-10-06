@@ -6,32 +6,52 @@ import sys
 import shutil
 import urllib.parse
 import re
+import time
 from pathlib import Path
 
 import database
 import storage
 
 PORT = int(os.environ.get("BUNNY_PORT", 8082))
-HOST = os.environ.get("BUNNY_HOST", "0.0.0.0")
+HOST = os.environ.get("BUNNY_HOST", "127.0.0.1")
+
+FAILED_ATTEMPTS = {}
 
 class BunnyRequestHandler(http.server.BaseHTTPRequestHandler):
 
     def send_cors_headers(self):
-        self.send_header("Access-Control-Allow-Origin", "*")
+        origin = self.headers.get("Origin", "")
+        allowed_env = os.environ.get("BUNNY_ALLOWED_ORIGIN", "").strip()
+
+        if allowed_env and allowed_env != "*":
+            allowed_list = [o.strip() for o in allowed_env.split(",") if o.strip()]
+            if origin in allowed_list:
+                self.send_header("Access-Control-Allow-Origin", origin)
+            else:
+                self.send_header("Access-Control-Allow-Origin", allowed_list[0])
+        elif origin:
+            self.send_header("Access-Control-Allow-Origin", origin)
+        else:
+            self.send_header("Access-Control-Allow-Origin", "*")
+
         self.send_header("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Telegram-Secret")
+        self.send_header("Access-Control-Allow-Credentials", "true")
 
     def do_OPTIONS(self):
         self.send_response(204)
         self.send_cors_headers()
         self.end_headers()
 
-    def send_json(self, data, status=200):
+    def send_json(self, data, status=200, headers=None):
         body = json.dumps(data).encode("utf-8")
         self.send_response(status)
         self.send_cors_headers()
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
+        if headers:
+            for k, v in headers.items():
+                self.send_header(k, v)
         self.end_headers()
         self.wfile.write(body)
 
@@ -126,75 +146,77 @@ class BunnyRequestHandler(http.server.BaseHTTPRequestHandler):
         if not session:
             return
 
-        if path == "/api/storage":
-            stats = storage.get_storage_stats()
-            self.send_json(stats)
-            return
-
-        if path == "/api/files":
-            folder = query.get("folder", [""])[0]
-            data = storage.list_files_and_folders(folder)
-            self.send_json(data)
-            return
-
-        # Download file: /api/files/{id}/download
-        file_download_match = re.match(r"^/api/files/(\d+)/download$", path)
-        if file_download_match:
-            file_id = int(file_download_match.group(1))
-            conn = database.get_db()
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM files WHERE id = ?", (file_id,))
-            file_record = cursor.fetchone()
-            conn.close()
-
-            if not file_record:
-                self.send_error_json("File not found", status=404)
+        try:
+            if path == "/api/storage":
+                stats = storage.get_storage_stats()
+                self.send_json(stats)
                 return
 
-            file_record = dict(file_record)
-            abs_path = storage.resolve_safe_path(file_record["relative_path"])
-            if not abs_path.exists():
-                self.send_error_json("Physical file not found", status=404)
+            if path == "/api/files":
+                folder = query.get("folder", [""])[0]
+                data = storage.list_files_and_folders(folder)
+                self.send_json(data)
                 return
 
-            self.send_response(200)
-            self.send_cors_headers()
-            self.send_header("Content-Type", file_record["mime_type"])
-            self.send_header("Content-Length", str(file_record["size_bytes"]))
-            self.send_header("Content-Disposition", f'attachment; filename="{file_record["filename"]}"')
-            self.end_headers()
+            # Download file: /api/files/{id}/download
+            file_download_match = re.match(r"^/api/files/(\d+)/download$", path)
+            if file_download_match:
+                file_id = int(file_download_match.group(1))
+                conn = database.get_db()
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM files WHERE id = ?", (file_id,))
+                file_record = cursor.fetchone()
+                conn.close()
 
-            with open(abs_path, "rb") as f:
-                shutil_copy = shutil.copyfileobj if hasattr(shutil, 'copyfileobj') else None
-                while True:
-                    chunk = f.read(65536)
-                    if not chunk:
-                        break
-                    self.wfile.write(chunk)
-            return
+                if not file_record:
+                    self.send_error_json("File not found", status=404)
+                    return
 
-        # Single file info: /api/files/{id}
-        file_info_match = re.match(r"^/api/files/(\d+)$", path)
-        if file_info_match:
-            file_id = int(file_info_match.group(1))
-            conn = database.get_db()
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM files WHERE id = ?", (file_id,))
-            file_record = cursor.fetchone()
-            conn.close()
-            if not file_record:
-                self.send_error_json("File not found", status=404)
-            else:
-                self.send_json(dict(file_record))
-            return
+                file_record = dict(file_record)
+                abs_path = storage.resolve_safe_path(file_record["relative_path"])
+                if not abs_path.exists():
+                    self.send_error_json("Physical file not found", status=404)
+                    return
 
-        if path == "/api/folders":
-            folder = query.get("parent", [""])[0]
-            data = storage.list_files_and_folders(folder)
-            self.send_json({"folders": data["folders"]})
-            return
+                self.send_response(200)
+                self.send_cors_headers()
+                self.send_header("Content-Type", file_record["mime_type"])
+                self.send_header("Content-Length", str(file_record["size_bytes"]))
+                self.send_header("Content-Disposition", f'attachment; filename="{file_record["filename"]}"')
+                self.end_headers()
 
-        self.send_error_json("Endpoint not found", status=404)
+                with open(abs_path, "rb") as f:
+                    while True:
+                        chunk = f.read(65536)
+                        if not chunk:
+                            break
+                        self.wfile.write(chunk)
+                return
+
+            # Single file info: /api/files/{id}
+            file_info_match = re.match(r"^/api/files/(\d+)$", path)
+            if file_info_match:
+                file_id = int(file_info_match.group(1))
+                conn = database.get_db()
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM files WHERE id = ?", (file_id,))
+                file_record = cursor.fetchone()
+                conn.close()
+                if not file_record:
+                    self.send_error_json("File not found", status=404)
+                else:
+                    self.send_json(dict(file_record))
+                return
+
+            if path == "/api/folders":
+                folder = query.get("parent", [""])[0]
+                data = storage.list_files_and_folders(folder)
+                self.send_json({"folders": data["folders"]})
+                return
+
+            self.send_error_json("Endpoint not found", status=404)
+        except ValueError as e:
+            self.send_error_json(str(e), status=400)
 
     def do_POST(self):
         parsed_url = urllib.parse.urlparse(self.path)
@@ -202,6 +224,17 @@ class BunnyRequestHandler(http.server.BaseHTTPRequestHandler):
 
         # Login endpoint
         if path == "/auth/login" or path == "/api/auth/login":
+            client_ip = self.client_address[0]
+            now = time.time()
+            max_attempts = int(os.environ.get("BUNNY_MAX_LOGIN_ATTEMPTS", "5"))
+            lockout_mins = int(os.environ.get("BUNNY_LOCKOUT_MINUTES", "5"))
+
+            ip_data = FAILED_ATTEMPTS.get(client_ip, {"count": 0, "lockout_until": 0})
+            if now < ip_data["lockout_until"]:
+                remaining = int(ip_data["lockout_until"] - now)
+                self.send_error_json(f"Too many failed login attempts. Locked out for {remaining}s.", status=429)
+                return
+
             body = self.read_json_body()
             if not body or "username" not in body or "password" not in body:
                 self.send_error_json("Username and password required", status=400)
@@ -209,16 +242,25 @@ class BunnyRequestHandler(http.server.BaseHTTPRequestHandler):
 
             user = database.authenticate_user(body["username"], body["password"])
             if not user:
+                ip_data["count"] += 1
+                if ip_data["count"] >= max_attempts:
+                    ip_data["lockout_until"] = now + (lockout_mins * 60)
+                FAILED_ATTEMPTS[client_ip] = ip_data
                 self.send_error_json("Invalid credentials", status=401)
                 return
 
+            # Clear failed attempts on successful login
+            if client_ip in FAILED_ATTEMPTS:
+                del FAILED_ATTEMPTS[client_ip]
+
             token = database.create_session(user["id"])
+            cookie_val = f"bunny_token={token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=259200"
             self.send_json({
                 "success": True,
                 "token": token,
                 "username": user["username"],
                 "role": user["role"]
-            })
+            }, headers={"Set-Cookie": cookie_val})
             return
 
         # Internal Telegram Ingestion API Endpoint
@@ -229,29 +271,32 @@ class BunnyRequestHandler(http.server.BaseHTTPRequestHandler):
                 self.send_error_json("Unauthorized internal call", status=401)
                 return
 
-            filename, folder_path, file_data = self.parse_multipart_data()
-            if not filename or file_data is None:
-                body = self.read_json_body()
-                if body and "filename" in body and "file_base64" in body:
-                    import base64
-                    filename = body["filename"]
-                    folder_path = body.get("folder", "Incoming")
-                    file_data = base64.b64decode(body["file_base64"])
-                    msg_id = body.get("telegram_message_id")
+            try:
+                filename, folder_path, file_data = self.parse_multipart_data()
+                if not filename or file_data is None:
+                    body = self.read_json_body()
+                    if body and "filename" in body and "file_base64" in body:
+                        import base64
+                        filename = body["filename"]
+                        folder_path = body.get("folder", "Incoming")
+                        file_data = base64.b64decode(body["file_base64"])
+                        msg_id = body.get("telegram_message_id")
+                    else:
+                        self.send_error_json("Missing file data", status=400)
+                        return
                 else:
-                    self.send_error_json("Missing file data", status=400)
-                    return
-            else:
-                msg_id = None
+                    msg_id = None
 
-            saved = storage.save_file(
-                filename=filename,
-                folder_path=folder_path or "Incoming",
-                file_bytes=file_data,
-                source="telegram",
-                telegram_msg_id=msg_id
-            )
-            self.send_json({"success": True, "file": saved})
+                saved = storage.save_file(
+                    filename=filename,
+                    folder_path=folder_path or "Incoming",
+                    file_bytes=file_data,
+                    source="telegram",
+                    telegram_msg_id=msg_id
+                )
+                self.send_json({"success": True, "file": saved})
+            except ValueError as e:
+                self.send_error_json(str(e), status=400)
             return
 
         # Protected Endpoints
@@ -265,38 +310,38 @@ class BunnyRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_json({"success": True})
             return
 
-        if path == "/api/files/upload":
-            filename, folder_path, file_data = self.parse_multipart_data()
-            if not filename or file_data is None:
-                self.send_error_json("No file uploaded", status=400)
+        try:
+            if path == "/api/files/upload":
+                filename, folder_path, file_data = self.parse_multipart_data()
+                if not filename or file_data is None:
+                    self.send_error_json("No file uploaded", status=400)
+                    return
+
+                saved = storage.save_file(
+                    filename=filename,
+                    folder_path=folder_path,
+                    file_bytes=file_data,
+                    source="web"
+                )
+                self.send_json({"success": True, "file": saved})
                 return
 
-            saved = storage.save_file(
-                filename=filename,
-                folder_path=folder_path,
-                file_bytes=file_data,
-                source="web"
-            )
-            self.send_json({"success": True, "file": saved})
-            return
+            if path == "/api/folders":
+                body = self.read_json_body() or {}
+                folder_name = body.get("name")
+                parent_path = body.get("parent_path", "")
 
-        if path == "/api/folders":
-            body = self.read_json_body() or {}
-            folder_name = body.get("name")
-            parent_path = body.get("parent_path", "")
+                if not folder_name:
+                    self.send_error_json("Folder name required", status=400)
+                    return
 
-            if not folder_name:
-                self.send_error_json("Folder name required", status=400)
-                return
-
-            try:
                 created = storage.create_folder(folder_name, parent_path)
                 self.send_json({"success": True, "folder": created})
-            except Exception as e:
-                self.send_error_json(str(e), status=400)
-            return
+                return
 
-        self.send_error_json("Endpoint not found", status=404)
+            self.send_error_json("Endpoint not found", status=404)
+        except ValueError as e:
+            self.send_error_json(str(e), status=400)
 
     def do_PATCH(self):
         parsed_url = urllib.parse.urlparse(self.path)
@@ -306,23 +351,26 @@ class BunnyRequestHandler(http.server.BaseHTTPRequestHandler):
         if not session:
             return
 
-        file_rename_match = re.match(r"^/api/files/(\d+)$", path)
-        if file_rename_match:
-            file_id = int(file_rename_match.group(1))
-            body = self.read_json_body() or {}
-            new_name = body.get("name")
-            if not new_name:
-                self.send_error_json("New filename required", status=400)
+        try:
+            file_rename_match = re.match(r"^/api/files/(\d+)$", path)
+            if file_rename_match:
+                file_id = int(file_rename_match.group(1))
+                body = self.read_json_body() or {}
+                new_name = body.get("name")
+                if not new_name:
+                    self.send_error_json("New filename required", status=400)
+                    return
+
+                updated = storage.rename_file(file_id, new_name)
+                if not updated:
+                    self.send_error_json("File not found", status=404)
+                else:
+                    self.send_json({"success": True, "file": updated})
                 return
 
-            updated = storage.rename_file(file_id, new_name)
-            if not updated:
-                self.send_error_json("File not found", status=404)
-            else:
-                self.send_json({"success": True, "file": updated})
-            return
-
-        self.send_error_json("Endpoint not found", status=404)
+            self.send_error_json("Endpoint not found", status=404)
+        except ValueError as e:
+            self.send_error_json(str(e), status=400)
 
     def do_DELETE(self):
         parsed_url = urllib.parse.urlparse(self.path)
@@ -332,17 +380,20 @@ class BunnyRequestHandler(http.server.BaseHTTPRequestHandler):
         if not session:
             return
 
-        file_delete_match = re.match(r"^/api/files/(\d+)$", path)
-        if file_delete_match:
-            file_id = int(file_delete_match.group(1))
-            success = storage.delete_file(file_id)
-            if success:
-                self.send_json({"success": True, "id": file_id})
-            else:
-                self.send_error_json("File not found or delete failed", status=404)
-            return
+        try:
+            file_delete_match = re.match(r"^/api/files/(\d+)$", path)
+            if file_delete_match:
+                file_id = int(file_delete_match.group(1))
+                success = storage.delete_file(file_id)
+                if success:
+                    self.send_json({"success": True, "id": file_id})
+                else:
+                    self.send_error_json("File not found or delete failed", status=404)
+                return
 
-        self.send_error_json("Endpoint not found", status=404)
+            self.send_error_json("Endpoint not found", status=404)
+        except ValueError as e:
+            self.send_error_json(str(e), status=400)
 
 def run_server():
     database.init_db()
@@ -357,6 +408,10 @@ def run_server():
     if not cursor.fetchone():
         database.create_user(admin_user, admin_pass, role="admin")
         print(f"Created initial admin user: '{admin_user}'")
+    else:
+        # If BUNNY_ADMIN_PASS is explicitly overridden in environment, sync it
+        if "BUNNY_ADMIN_PASS" in os.environ:
+            database.update_user_password(admin_user, admin_pass)
     conn.close()
 
     server_address = (HOST, PORT)
@@ -370,3 +425,4 @@ def run_server():
 
 if __name__ == "__main__":
     run_server()
+

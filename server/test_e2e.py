@@ -109,5 +109,63 @@ class TestE2EFlow(unittest.TestCase):
             del_res = json.loads(resp.read().decode())
             self.assertTrue(del_res["success"])
 
+    def test_unauthenticated_requests_return_401(self):
+        base_url = "http://127.0.0.1:8999"
+        protected_endpoints = [
+            ("/api/storage", "GET"),
+            ("/api/files?folder=Firmware", "GET"),
+            ("/api/files/1/download", "GET"),
+            ("/api/files/1", "DELETE"),
+        ]
+
+        for ep, method in protected_endpoints:
+            req = urllib.request.Request(f"{base_url}{ep}", method=method)
+            try:
+                with urllib.request.urlopen(req) as resp:
+                    self.fail(f"Endpoint {ep} should have failed with 401, got HTTP {resp.status}")
+            except urllib.error.HTTPError as err:
+                self.assertEqual(err.code, 401, f"Expected 401 for {ep}, got {err.code}")
+
+    def test_path_traversal_returns_400(self):
+        base_url = "http://127.0.0.1:8999"
+        
+        # Get valid token
+        login_data = json.dumps({"username": "BUNNY", "password": "123456"}).encode()
+        req = urllib.request.Request(f"{base_url}/auth/login", data=login_data, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req) as resp:
+            token = json.loads(resp.read().decode())["token"]
+
+        headers = {"Authorization": f"Bearer {token}"}
+        
+        # Test folder creation with path traversal
+        body = json.dumps({"name": "../../../hacked", "parent_path": "Projects"}).encode()
+        req = urllib.request.Request(f"{base_url}/api/folders", data=body, headers={"Content-Type": "application/json", **headers})
+        try:
+            with urllib.request.urlopen(req) as resp:
+                self.fail("Path traversal folder creation should fail with 400")
+        except urllib.error.HTTPError as err:
+            self.assertEqual(err.code, 400)
+
+    def test_rate_limiting(self):
+        base_url = "http://127.0.0.1:8999"
+        bad_login = json.dumps({"username": "BUNNY", "password": "wrong_password_xyz"}).encode()
+
+        # Perform failed login attempts up to max threshold (5)
+        for i in range(5):
+            req = urllib.request.Request(f"{base_url}/auth/login", data=bad_login, headers={"Content-Type": "application/json"})
+            try:
+                urllib.request.urlopen(req)
+            except urllib.error.HTTPError as err:
+                self.assertEqual(err.code, 401)
+
+        # 6th attempt should return 429 Too Many Requests
+        req = urllib.request.Request(f"{base_url}/auth/login", data=bad_login, headers={"Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(req) as resp:
+                self.fail("Should have been rate limited with 429")
+        except urllib.error.HTTPError as err:
+            self.assertEqual(err.code, 429)
+
 if __name__ == "__main__":
     unittest.main()
+

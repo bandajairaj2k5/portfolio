@@ -144,10 +144,14 @@ async function main() {
       const bunnyTarget = process.env.BUNNY_SERVER_URL || 'http://127.0.0.1:8082';
       try {
         const targetUrl = new URL(req.url, bunnyTarget);
-        const { http: httpMod } = await import('node:http');
+        const isHttps = targetUrl.protocol === 'https:';
+        const httpMod = isHttps ? await import('node:https') : await import('node:http');
         const proxyReq = httpMod.request(targetUrl, {
           method: req.method,
-          headers: req.headers,
+          headers: {
+            ...req.headers,
+            host: targetUrl.host
+          },
         }, (proxyRes) => {
           res.writeHead(proxyRes.statusCode, proxyRes.headers);
           proxyRes.pipe(res, { end: true });
