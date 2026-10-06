@@ -9,13 +9,25 @@ DEFAULT_FOLDERS = ["Projects", "Firmware", "Documents", "Resume", "Backups", "In
 
 def get_storage_root() -> Path:
     env_root = os.environ.get("BUNNY_STORAGE_ROOT")
+    candidate_paths = []
     if env_root:
-        path_str = env_root
-    elif os.path.exists("/sdcard"):
-        path_str = "/sdcard/CloudStorage"
-    else:
-        path_str = os.path.join(os.path.expanduser("~"), "CloudStorage")
-    root = Path(path_str).resolve()
+        candidate_paths.append(env_root)
+    if os.path.exists("/sdcard"):
+        candidate_paths.append("/sdcard/CloudStorage")
+    candidate_paths.append(os.path.join(os.path.expanduser("~"), "CloudStorage"))
+
+    for p in candidate_paths:
+        try:
+            root = Path(p).resolve()
+            root.mkdir(parents=True, exist_ok=True)
+            test_file = root / ".perm_check"
+            test_file.touch()
+            test_file.unlink()
+            return root
+        except Exception:
+            continue
+
+    root = Path(os.path.expanduser("~/CloudStorage")).resolve()
     root.mkdir(parents=True, exist_ok=True)
     return root
 
