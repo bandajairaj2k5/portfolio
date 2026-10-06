@@ -20,12 +20,12 @@ def get_storage_root() -> Path:
         try:
             root = Path(p).resolve()
             root.mkdir(parents=True, exist_ok=True)
-            test_dir = root / ".perm_check_dir"
-            test_dir.mkdir(parents=True, exist_ok=True)
-            test_file = test_dir / ".perm_check"
+            test_sub = root / ".test_sub"
+            test_sub.mkdir(parents=True, exist_ok=True)
+            test_file = test_sub / ".perm_check"
             test_file.touch()
             test_file.unlink()
-            test_dir.rmdir()
+            test_sub.rmdir()
             return root
         except Exception:
             continue
