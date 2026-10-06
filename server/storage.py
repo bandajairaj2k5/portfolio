@@ -2,6 +2,7 @@ import os
 import shutil
 import hashlib
 import mimetypes
+import time
 from pathlib import Path
 import database
 
@@ -20,10 +21,8 @@ def get_storage_root() -> Path:
         try:
             root = Path(p).resolve()
             root.mkdir(parents=True, exist_ok=True)
-            test_sub = root / "Projects"
-            test_sub.mkdir(parents=True, exist_ok=True)
-            test_file = test_sub / ".perm_check"
-            test_file.touch()
+            test_file = root / f".perm_test_{int(time.time())}.tmp"
+            test_file.write_bytes(b"test")
             test_file.unlink()
             return root
         except Exception:
