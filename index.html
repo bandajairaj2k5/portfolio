@@ -2139,10 +2139,10 @@
     /* BUNNY CLOUD FRONTEND JAVASCRIPT LOGIC */
     let currentBunnyFolder = '';
     let bunnyToken = localStorage.getItem('bunny_token') || '';
-    const DEFAULT_BUNNY_API_URL = 'https://existed-citizenship-annotation-preview.trycloudflare.com';
+    const DEFAULT_BUNNY_API_URL = 'https://hosts-lcd-ethernet-prime.trycloudflare.com';
 
     function getBunnyApiUrl(endpoint) {
-      let baseUrl = localStorage.getItem('bunny_server_url') || DEFAULT_BUNNY_API_URL;
+      let baseUrl = DEFAULT_BUNNY_API_URL;
       baseUrl = baseUrl.trim().replace(/\/$/, '');
       return baseUrl + endpoint;
     }
