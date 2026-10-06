@@ -20,9 +20,12 @@ def get_storage_root() -> Path:
         try:
             root = Path(p).resolve()
             root.mkdir(parents=True, exist_ok=True)
-            test_file = root / ".perm_check"
+            test_dir = root / ".perm_check_dir"
+            test_dir.mkdir(parents=True, exist_ok=True)
+            test_file = test_dir / ".perm_check"
             test_file.touch()
             test_file.unlink()
+            test_dir.rmdir()
             return root
         except Exception:
             continue
@@ -37,8 +40,15 @@ def init_storage_structure():
     cursor = conn.cursor()
 
     for folder in DEFAULT_FOLDERS:
-        folder_dir = root / folder
-        folder_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            folder_dir = root / folder
+            folder_dir.mkdir(parents=True, exist_ok=True)
+        except PermissionError:
+            root = Path(os.path.expanduser("~/CloudStorage")).resolve()
+            root.mkdir(parents=True, exist_ok=True)
+            folder_dir = root / folder
+            folder_dir.mkdir(parents=True, exist_ok=True)
+
         rel_path = folder.strip("/")
         cursor.execute("SELECT id FROM folders WHERE relative_path = ?", (rel_path,))
         if not cursor.fetchone():
